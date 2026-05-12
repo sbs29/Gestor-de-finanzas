@@ -53,4 +53,15 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleEmailExists(EmailAlreadyExistsException ex) {
+        return new ErrorResponse(
+                400,
+                "Email already exists",
+                LocalDateTime.now(),
+                null
+        );
+    }
 }
