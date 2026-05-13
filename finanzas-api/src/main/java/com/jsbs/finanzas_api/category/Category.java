@@ -33,4 +33,8 @@ public class Category {
     @Column(nullable = false)
     private CategoryType type;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }

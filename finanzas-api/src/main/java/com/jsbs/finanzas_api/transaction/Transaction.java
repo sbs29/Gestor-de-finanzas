@@ -1,6 +1,7 @@
 package com.jsbs.finanzas_api.transaction;
 
 import com.jsbs.finanzas_api.category.Category;
+import com.jsbs.finanzas_api.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,4 +42,7 @@ public class Transaction {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

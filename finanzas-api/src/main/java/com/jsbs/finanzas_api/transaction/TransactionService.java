@@ -4,6 +4,8 @@ import com.jsbs.finanzas_api.category.Category;
 import com.jsbs.finanzas_api.category.CategoryRepository;
 import com.jsbs.finanzas_api.common.exception.CategoryNotFoundException;
 import com.jsbs.finanzas_api.common.exception.TransactionNotFoundException;
+import com.jsbs.finanzas_api.security.CurrentUserService;
+import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,11 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
+    private final CurrentUserService currentUserService;
 
     public TransactionResponse createTransaction(TransactionRequest request) {
+
+        User currentUser = currentUserService.getCurrentUser();
 
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() ->new CategoryNotFoundException(request.categoryId()));
@@ -27,6 +32,7 @@ public class TransactionService {
                 .description(request.description())
                 .date(request.date())
                 .category(category)
+                .user(currentUser)
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
@@ -49,7 +55,8 @@ public class TransactionService {
     }
 
     public List<TransactionResponse> getAllTransactions() {
-        return transactionRepository.findAll()
+        User currentUser = currentUserService.getCurrentUser();
+        return transactionRepository.findByUser(currentUser)
                 .stream()
                 .map(this::toResponse)
                 .toList();

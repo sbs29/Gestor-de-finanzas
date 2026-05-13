@@ -1,6 +1,8 @@
 package com.jsbs.finanzas_api.category;
 
 import com.jsbs.finanzas_api.common.exception.CategoryNotFoundException;
+import com.jsbs.finanzas_api.security.CurrentUserService;
+import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +14,23 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    private final CurrentUserService currentUserService;
+
     public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll()
+        User currentUser = currentUserService.getCurrentUser();
+        return categoryRepository.findByUser(currentUser)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public CategoryResponse createCategory(CategoryRequest request) {
+        User currentUser = currentUserService.getCurrentUser();
+
         Category category = Category.builder()
                 .name(request.name())
                 .type(request.type())
+                .user(currentUser)
                 .build();
 
         Category savedCategory = categoryRepository.save(category);

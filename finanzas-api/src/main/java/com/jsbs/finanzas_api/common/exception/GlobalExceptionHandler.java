@@ -64,4 +64,15 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidCredentials(InvalidCredentialsException ex) {
+        return new ErrorResponse(
+                400,
+                "Invalid Credentials",
+                LocalDateTime.now(),
+                null
+        );
+    }
 }

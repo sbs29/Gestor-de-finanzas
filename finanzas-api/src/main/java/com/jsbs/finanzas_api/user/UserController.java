@@ -1,6 +1,8 @@
 package com.jsbs.finanzas_api.user;
 
 import com.jsbs.finanzas_api.auth.AuthResponse;
+import com.jsbs.finanzas_api.auth.LoginRequest;
+import com.jsbs.finanzas_api.auth.LoginResponse;
 import com.jsbs.finanzas_api.auth.RegisterRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,4 +26,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
+    }
 }
