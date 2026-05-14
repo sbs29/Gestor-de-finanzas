@@ -2,11 +2,19 @@ package com.jsbs.finanzas_api.transaction;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -19,6 +27,40 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> createTransaction(@Valid @RequestBody TransactionRequest request) {
         TransactionResponse response = transactionService.createTransaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/summary")
+    public TransactionSummaryResponse getSummary(
+            @RequestParam("start")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime start,
+
+            @RequestParam("end")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime end
+    ) {
+        return transactionService.getSummary(start, end);
+    }
+
+    @GetMapping("/summary/month")
+    public TransactionSummaryResponse getCurrentMonthSummary() {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.withDayOfMonth(1);
+        LocalDate endDate = today.withDayOfMonth(today.lengthOfMonth());
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+        return transactionService.getSummary(start, end);
+    }
+
+    @GetMapping("/summary/week")
+    public TransactionSummaryResponse getCurrentWeekSummary() {
+        LocalDate today = LocalDate.now();
+        DayOfWeek firstDayConfig = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        LocalDate startDate = today.with(TemporalAdjusters.previousOrSame(firstDayConfig));
+        LocalDate endDate = startDate.plusDays(6);
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+        return transactionService.getSummary(start, end);
     }
 
     @GetMapping

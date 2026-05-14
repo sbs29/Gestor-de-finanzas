@@ -2,6 +2,7 @@ package com.jsbs.finanzas_api.transaction;
 
 import com.jsbs.finanzas_api.category.Category;
 import com.jsbs.finanzas_api.category.CategoryRepository;
+import com.jsbs.finanzas_api.category.CategoryType;
 import com.jsbs.finanzas_api.common.exception.CategoryNotFoundException;
 import com.jsbs.finanzas_api.common.exception.TransactionNotFoundException;
 import com.jsbs.finanzas_api.security.CurrentUserService;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -64,7 +67,9 @@ public class TransactionService {
 
     public TransactionResponse getTransactionById(Long id) {
 
-        Transaction transaction = transactionRepository.findById(id)
+        User currentUser = currentUserService.getCurrentUser();
+
+        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         return toResponse(transaction);
@@ -73,7 +78,9 @@ public class TransactionService {
     @Transactional
     public void deleteTransactionById(Long id) {
 
-        Transaction transaction = transactionRepository.findById(id)
+        User currentUser = currentUserService.getCurrentUser();
+
+        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         transactionRepository.delete(transaction);
@@ -82,7 +89,9 @@ public class TransactionService {
     @Transactional
     public TransactionResponse updateTransaction(Long id, TransactionRequest request) {
 
-        Transaction transaction = transactionRepository.findById(id)
+        User currentUser = currentUserService.getCurrentUser();
+
+        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         Category category = categoryRepository.findById(request.categoryId())
@@ -96,5 +105,30 @@ public class TransactionService {
         Transaction updatedTransaction = transactionRepository.save(transaction);
 
         return toResponse(updatedTransaction);
+    }
+
+    public TransactionSummaryResponse getSummary(LocalDateTime start, LocalDateTime end) {
+        User currentUser = currentUserService.getCurrentUser();
+
+        List<Transaction> transactions = transactionRepository.findByUserAndDateBetween(currentUser, start, end);
+
+        BigDecimal income = BigDecimal.ZERO;
+        BigDecimal expense = BigDecimal.ZERO;
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getCategory().getType() == CategoryType.INCOME) {
+                income = income.add(transaction.getAmount());
+            } else if (transaction.getCategory().getType() == CategoryType.EXPENSE) {
+                expense = expense.add(transaction.getAmount());
+            }
+        }
+
+        BigDecimal balance = income.subtract(expense);
+
+        return new TransactionSummaryResponse(
+                income,
+                expense,
+                balance
+        );
     }
 }
