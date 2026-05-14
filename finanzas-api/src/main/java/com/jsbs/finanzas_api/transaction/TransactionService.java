@@ -138,11 +138,17 @@ public class TransactionService {
         );
     }
 
-    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable) {
+    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable, CategoryType type) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Page<Transaction> transactionsPage = transactionRepository.findByUser(currentUser, pageable);
+        Page<Transaction> transactionsPage;
+
+        if (type != null){
+            transactionsPage = transactionRepository.findByUserAndCategory_Type(currentUser, type, pageable);
+        } else {
+            transactionsPage = transactionRepository.findByUser(currentUser, pageable);
+        }
 
         List<TransactionResponse> content = transactionsPage.getContent()
                 .stream()

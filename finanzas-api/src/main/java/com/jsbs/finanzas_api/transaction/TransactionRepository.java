@@ -1,5 +1,6 @@
 package com.jsbs.finanzas_api.transaction;
 
+import com.jsbs.finanzas_api.category.CategoryType;
 import com.jsbs.finanzas_api.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByUserAndDateBetween(User user, LocalDateTime start, LocalDateTime end);
 
     Page<Transaction> findByUser(User user, Pageable pageable);
+
+    Page<Transaction> findByUserAndCategory_Type(User user, CategoryType type, Pageable pageable);
 }

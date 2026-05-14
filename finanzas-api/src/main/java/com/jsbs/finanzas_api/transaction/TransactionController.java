@@ -1,6 +1,7 @@
 package com.jsbs.finanzas_api.transaction;
 
 import com.jsbs.finanzas_api.auth.PagedResponse;
+import com.jsbs.finanzas_api.category.CategoryType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,8 +68,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable) {
-        return transactionService.getAllTransactions(pageable);
+    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable, @RequestParam(required = false)CategoryType type) {
+        return transactionService.getAllTransactions(pageable, type);
     }
 
     @GetMapping("/{id}")
