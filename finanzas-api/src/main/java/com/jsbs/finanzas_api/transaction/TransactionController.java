@@ -68,8 +68,12 @@ public class TransactionController {
     }
 
     @GetMapping
-    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable, @RequestParam(required = false)CategoryType type) {
-        return transactionService.getAllTransactions(pageable, type);
+    public PagedResponse<TransactionResponse> getAllTransactions(
+            Pageable pageable,
+            @RequestParam(required = false)CategoryType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+        return transactionService.getAllTransactions(pageable, type, start, end);
     }
 
     @GetMapping("/{id}")

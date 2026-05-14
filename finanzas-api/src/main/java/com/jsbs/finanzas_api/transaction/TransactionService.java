@@ -11,6 +11,7 @@ import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,17 +139,24 @@ public class TransactionService {
         );
     }
 
-    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable, CategoryType type) {
+    public PagedResponse<TransactionResponse> getAllTransactions(
+            Pageable pageable,
+            CategoryType type,
+            LocalDateTime start,
+            LocalDateTime end) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Page<Transaction> transactionsPage;
+        Specification<Transaction> spec = TransactionSpecification.belongsToUser(currentUser);
 
         if (type != null){
-            transactionsPage = transactionRepository.findByUserAndCategory_Type(currentUser, type, pageable);
-        } else {
-            transactionsPage = transactionRepository.findByUser(currentUser, pageable);
+            spec = spec.and(TransactionSpecification.hasCategoryType(type));
         }
+        if (start != null && end != null){
+            spec = spec.and(TransactionSpecification.hasCDateBetween(start, end));
+        }
+
+        Page<Transaction> transactionsPage = transactionRepository.findAll(spec, pageable);
 
         List<TransactionResponse> content = transactionsPage.getContent()
                 .stream()
@@ -164,4 +172,6 @@ public class TransactionService {
                 transactionsPage.isLast()
         );
     }
+
+
 }
