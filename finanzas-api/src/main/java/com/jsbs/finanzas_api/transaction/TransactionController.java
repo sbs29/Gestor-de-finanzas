@@ -1,5 +1,6 @@
 package com.jsbs.finanzas_api.transaction;
 
+import com.jsbs.finanzas_api.auth.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,7 +67,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
+    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable) {
         return transactionService.getAllTransactions(pageable);
     }
 

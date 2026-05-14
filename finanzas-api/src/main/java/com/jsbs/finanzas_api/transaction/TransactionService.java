@@ -1,5 +1,6 @@
 package com.jsbs.finanzas_api.transaction;
 
+import com.jsbs.finanzas_api.auth.PagedResponse;
 import com.jsbs.finanzas_api.category.Category;
 import com.jsbs.finanzas_api.category.CategoryRepository;
 import com.jsbs.finanzas_api.category.CategoryType;
@@ -137,10 +138,24 @@ public class TransactionService {
         );
     }
 
-    public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
+    public PagedResponse<TransactionResponse> getAllTransactions(Pageable pageable) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        return transactionRepository.findByUser(currentUser, pageable).map(this::toResponse);
+        Page<Transaction> transactionsPage = transactionRepository.findByUser(currentUser, pageable);
+
+        List<TransactionResponse> content = transactionsPage.getContent()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new PagedResponse<>(
+                content,
+                transactionsPage.getNumber(),
+                transactionsPage.getSize(),
+                transactionsPage.getTotalElements(),
+                transactionsPage.getTotalPages(),
+                transactionsPage.isLast()
+        );
     }
 }
