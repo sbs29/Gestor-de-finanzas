@@ -2,6 +2,7 @@ package com.jsbs.finanzas_api.transaction;
 
 import com.jsbs.finanzas_api.category.Category;
 import com.jsbs.finanzas_api.category.CategoryType;
+import com.jsbs.finanzas_api.common.exception.TransactionNotFoundException;
 import com.jsbs.finanzas_api.security.CurrentUserService;
 import com.jsbs.finanzas_api.user.Role;
 import com.jsbs.finanzas_api.user.User;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
@@ -98,5 +100,33 @@ class TransactionServiceTest {
 
         verify(transactionRepository)
                 .findByUserAndDateBetween(user, start, end);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTransactionNotFound() {
+        // arrange
+
+        Long transactionId = 99L;
+
+        User user = User.builder()
+                .id(1L)
+                .name("Demo User")
+                .email("demo@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        when(currentUserService.getCurrentUser()).thenReturn(user);
+        when(transactionRepository.findByIdAndUser(transactionId, user))
+                .thenReturn(Optional.empty());
+
+        // act + assert
+
+        assertThatThrownBy(() ->
+                transactionService.getTransactionById(transactionId)
+        ).isInstanceOf(TransactionNotFoundException.class);
+
+        verify(currentUserService).getCurrentUser();
+        verify(transactionRepository).findByIdAndUser(transactionId, user);
     }
 }
