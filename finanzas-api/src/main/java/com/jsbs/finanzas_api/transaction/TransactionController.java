@@ -2,6 +2,8 @@ package com.jsbs.finanzas_api.transaction;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,8 +66,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionResponse> getAllTransactions() {
-        return transactionService.getAllTransactions();
+    public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
+        return transactionService.getAllTransactions(pageable);
     }
 
     @GetMapping("/{id}")

@@ -8,6 +8,8 @@ import com.jsbs.finanzas_api.common.exception.TransactionNotFoundException;
 import com.jsbs.finanzas_api.security.CurrentUserService;
 import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,7 @@ public class TransactionService {
     }
 
     private TransactionResponse toResponse(Transaction transaction) {
+
         Category category = transaction.getCategory();
 
         return new TransactionResponse(
@@ -58,6 +61,7 @@ public class TransactionService {
     }
 
     public List<TransactionResponse> getAllTransactions() {
+
         User currentUser = currentUserService.getCurrentUser();
         return transactionRepository.findByUser(currentUser)
                 .stream()
@@ -108,6 +112,7 @@ public class TransactionService {
     }
 
     public TransactionSummaryResponse getSummary(LocalDateTime start, LocalDateTime end) {
+
         User currentUser = currentUserService.getCurrentUser();
 
         List<Transaction> transactions = transactionRepository.findByUserAndDateBetween(currentUser, start, end);
@@ -130,5 +135,12 @@ public class TransactionService {
                 expense,
                 balance
         );
+    }
+
+    public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
+
+        User currentUser = currentUserService.getCurrentUser();
+
+        return transactionRepository.findByUser(currentUser, pageable).map(this::toResponse);
     }
 }
