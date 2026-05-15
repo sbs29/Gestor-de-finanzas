@@ -17,6 +17,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.springframework.http.MediaType;
@@ -112,5 +115,31 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.amount").value(100.00))
                 .andExpect(jsonPath("$.description")
                         .value("Supermercado"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnBadRequestWhenTransactionRequestIsInvalid() throws Exception {
+
+        TransactionRequest request = new TransactionRequest(
+                null,
+                "",
+                null,
+                null
+        );
+
+        mockMvc.perform(post("/api/transactions")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors.amount").value("El importe es obligatorio"))
+                .andExpect(jsonPath("$.errors.description").value("La descripción es obligatoria"))
+                .andExpect(jsonPath("$.errors.date").value("La fecha es obligatoria"))
+                .andExpect(jsonPath("$.errors.categoryId").value("La categoría es obligatoria"));
+
+        verify(transactionService, never()).createTransaction(any());
     }
 }
