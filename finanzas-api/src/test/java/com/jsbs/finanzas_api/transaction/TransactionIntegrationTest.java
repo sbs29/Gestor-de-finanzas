@@ -224,4 +224,60 @@ class TransactionIntegrationTest {
                         .value(1));
     }
 
+    @Test
+    void shouldNotReturnTransactionsFromAnotherUser()
+            throws Exception {
+
+        User userA = User.builder()
+                .name("User A")
+                .email("usera@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUserA = userRepository.save(userA);
+
+        User userB = User.builder()
+                .name("User B")
+                .email("userb@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUserB = userRepository.save(userB);
+
+        Category category = Category.builder()
+                .name("Comida")
+                .type(CategoryType.EXPENSE)
+                .user(savedUserA)
+                .build();
+
+        Category savedCategory = categoryRepository.save(category);
+
+        Transaction transaction = Transaction.builder()
+                .amount(new BigDecimal("99.99"))
+                .description("Privada")
+                .date(LocalDateTime.now())
+                .category(savedCategory)
+                .user(savedUserA)
+                .build();
+
+        transactionRepository.save(transaction);
+
+        mockMvc.perform(get("/api/transactions")
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        savedUserB,
+                                        null,
+                                        List.of()
+                                )
+                        ))
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
 }
