@@ -23,8 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -278,6 +277,158 @@ class TransactionIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty())
                 .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    void shouldReturnTransactionById()
+            throws Exception {
+
+        User user = User.builder()
+                .name("Demo User")
+                .email("demo@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Category category = Category.builder()
+                .name("Comida")
+                .type(CategoryType.EXPENSE)
+                .user(savedUser)
+                .build();
+
+        Category savedCategory = categoryRepository.save(category);
+
+        Transaction transaction = Transaction.builder()
+                .amount(new BigDecimal("45.00"))
+                .description("Cena")
+                .date(LocalDateTime.now())
+                .category(savedCategory)
+                .user(savedUser)
+                .build();
+
+        Transaction savedTransaction =
+                transactionRepository.save(transaction);
+
+        mockMvc.perform(get("/api/transactions/" +
+                        savedTransaction.getId())
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        savedUser,
+                                        null,
+                                        List.of()
+                                )
+                        )))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id")
+                        .value(savedTransaction.getId()))
+                .andExpect(jsonPath("$.description")
+                        .value("Cena"))
+                .andExpect(jsonPath("$.amount")
+                        .value(45.00));
+    }
+
+    @Test
+    void shouldNotReturnTransactionFromAnotherUser()
+            throws Exception {
+
+        User userA = User.builder()
+                .name("User A")
+                .email("usera@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUserA = userRepository.save(userA);
+
+        User userB = User.builder()
+                .name("User B")
+                .email("userb@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUserB = userRepository.save(userB);
+
+        Category category = Category.builder()
+                .name("Privada")
+                .type(CategoryType.EXPENSE)
+                .user(savedUserA)
+                .build();
+
+        Category savedCategory = categoryRepository.save(category);
+
+        Transaction transaction = Transaction.builder()
+                .amount(new BigDecimal("100.00"))
+                .description("Secreta")
+                .date(LocalDateTime.now())
+                .category(savedCategory)
+                .user(savedUserA)
+                .build();
+
+        Transaction savedTransaction =
+                transactionRepository.save(transaction);
+
+        mockMvc.perform(get("/api/transactions/" +
+                        savedTransaction.getId())
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        savedUserB,
+                                        null,
+                                        List.of()
+                                )
+                        )))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldDeleteOwnTransaction() throws Exception {
+
+        User user = User.builder()
+                .name("Demo User")
+                .email("demo@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Category category = Category.builder()
+                .name("Comida")
+                .type(CategoryType.EXPENSE)
+                .user(savedUser)
+                .build();
+
+        Category savedCategory = categoryRepository.save(category);
+
+        Transaction transaction = Transaction.builder()
+                .amount(new BigDecimal("30.00"))
+                .description("Compra a borrar")
+                .date(LocalDateTime.now())
+                .category(savedCategory)
+                .user(savedUser)
+                .build();
+
+        Transaction savedTransaction =
+                transactionRepository.save(transaction);
+
+        mockMvc.perform(delete("/api/transactions/" + savedTransaction.getId())
+                        .with(csrf())
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        savedUser,
+                                        null,
+                                        List.of()
+                                )
+                        )))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        assertThat(transactionRepository.findById(savedTransaction.getId()))
+                .isEmpty();
     }
 
 }
