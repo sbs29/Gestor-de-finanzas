@@ -1,6 +1,8 @@
 package com.jsbs.finanzas_api.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jsbs.finanzas_api.auth.LoginRequest;
+import com.jsbs.finanzas_api.auth.LoginResponse;
 import com.jsbs.finanzas_api.category.Category;
 import com.jsbs.finanzas_api.category.CategoryRepository;
 import com.jsbs.finanzas_api.category.CategoryType;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -47,6 +50,9 @@ class TransactionIntegrationTest {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -429,6 +435,139 @@ class TransactionIntegrationTest {
 
         assertThat(transactionRepository.findById(savedTransaction.getId()))
                 .isEmpty();
+    }
+
+    @Test
+    void shouldUpdateOwnTransaction() throws Exception {
+
+        User user = User.builder()
+                .name("Demo User")
+                .email("demo@test.com")
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Category category = Category.builder()
+                .name("Comida")
+                .type(CategoryType.EXPENSE)
+                .user(savedUser)
+                .build();
+
+        Category savedCategory = categoryRepository.save(category);
+
+        Transaction transaction = Transaction.builder()
+                .amount(new BigDecimal("20.00"))
+                .description("Compra original")
+                .date(LocalDateTime.now())
+                .category(savedCategory)
+                .user(savedUser)
+                .build();
+
+        Transaction savedTransaction =
+                transactionRepository.save(transaction);
+
+        TransactionRequest request = new TransactionRequest(
+                new BigDecimal("45.00"),
+                "Compra actualizada",
+                LocalDateTime.now(),
+                savedCategory.getId()
+        );
+
+        mockMvc.perform(put("/api/transactions/" + savedTransaction.getId())
+                        .with(csrf())
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(
+                                        savedUser,
+                                        null,
+                                        List.of()
+                                )
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Compra actualizada"))
+                .andExpect(jsonPath("$.amount").value(45.00));
+
+        Transaction updatedTransaction =
+                transactionRepository.findById(savedTransaction.getId())
+                        .orElseThrow();
+
+        assertThat(updatedTransaction.getDescription())
+                .isEqualTo("Compra actualizada");
+
+        assertThat(updatedTransaction.getAmount())
+                .isEqualByComparingTo("45.00");
+    }
+
+
+    @Test
+    void shouldAccessProtectedEndpointWithRealJwtToken()
+            throws Exception {
+
+        User user = User.builder()
+                .name("Demo User")
+                .email("demo@test.com")
+                .password(passwordEncoder.encode("123456"))
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(user);
+
+        LoginRequest loginRequest = new LoginRequest(
+                "demo@test.com",
+                "123456"
+        );
+
+        String responseBody = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        LoginResponse loginResponse =
+                objectMapper.readValue(
+                        responseBody,
+                        LoginResponse.class
+                );
+
+        mockMvc.perform(get("/api/transactions")
+                        .header("Authorization",
+                                "Bearer " + loginResponse.token())
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenAccessingProtectedEndpointWithoutToken() throws Exception {
+
+        mockMvc.perform(get("/api/transactions")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldRejectInvalidJwtToken() throws Exception {
+
+        mockMvc.perform(get("/api/transactions")
+                        .header(
+                                "Authorization",
+                                "Bearer invalid-token"
+                        )
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
 }
