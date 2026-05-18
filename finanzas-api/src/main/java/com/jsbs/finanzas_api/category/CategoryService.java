@@ -16,11 +16,13 @@ public class CategoryService {
 
     private final CurrentUserService currentUserService;
 
+    private final CategoryMapper categoryMapper;
+
     public List<CategoryResponse> getAllCategories() {
         User currentUser = currentUserService.getCurrentUser();
         return categoryRepository.findByUser(currentUser)
                 .stream()
-                .map(this::toResponse)
+                .map(categoryMapper::toResponse)
                 .toList();
     }
 
@@ -35,15 +37,7 @@ public class CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
 
-        return toResponse(savedCategory);
-    }
-
-    private CategoryResponse toResponse(Category category) {
-        return new CategoryResponse(
-                category.getId(),
-                category.getName(),
-                category.getType()
-        );
+        return categoryMapper.toResponse(savedCategory);
     }
 
     public CategoryResponse getCategoryById(Long id) {
@@ -51,6 +45,6 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->new CategoryNotFoundException(id));
 
-        return toResponse(category);
+        return categoryMapper.toResponse(category);
     }
 }

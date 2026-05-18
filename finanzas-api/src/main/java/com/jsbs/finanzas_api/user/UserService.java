@@ -21,6 +21,8 @@ public class UserService {
 
     private final JwtService jwtService;
 
+    private final UserMapper userMapper;
+
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
@@ -36,16 +38,7 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return toResponse(savedUser);
-    }
-
-    private AuthResponse toResponse(User user) {
-        return new AuthResponse(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole().toString()
-        );
+        return userMapper.toAuthResponse(savedUser);
     }
 
     public LoginResponse login(LoginRequest request) {
