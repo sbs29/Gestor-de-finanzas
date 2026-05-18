@@ -66,11 +66,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleInvalidCredentials(InvalidCredentialsException ex) {
         return new ErrorResponse(
-                400,
-                "Invalid Credentials",
+                401,
+                ex.getMessage(),
                 LocalDateTime.now(),
                 null
         );

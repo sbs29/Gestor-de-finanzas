@@ -570,4 +570,43 @@ class TransactionIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void shouldReturnUnauthorizedWhenCredentialsAreInvalid()
+            throws Exception {
+
+        LoginRequest request = new LoginRequest(
+                "wrong@test.com",
+                "wrong-password"
+        );
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status")
+                        .value(401))
+                .andExpect(jsonPath("$.message")
+                        .value("Invalid Credentials"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenLoginRequestIsInvalid()
+            throws Exception {
+
+        LoginRequest request = new LoginRequest(
+                "",
+                ""
+        );
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors").exists());
+    }
+
 }
