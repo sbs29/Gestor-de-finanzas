@@ -11,15 +11,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>,
+        JpaSpecificationExecutor<Transaction> {
 
     List<Transaction> findByUser(User user);
 
     Optional<Transaction> findByIdAndUser(Long id, User user);
 
-    List<Transaction> findByUserAndDateBetween(User user, LocalDateTime start, LocalDateTime end);
+    List<Transaction> findByUserAndDateBetween(
+            User user,
+            LocalDateTime start,
+            LocalDateTime end
+    );
 
     Page<Transaction> findByUser(User user, Pageable pageable);
-
-    Page<Transaction> findByUserAndCategory_TypeAndDateBetween(User user, CategoryType type, Pageable pageable, LocalDateTime start, LocalDateTime end);
 }

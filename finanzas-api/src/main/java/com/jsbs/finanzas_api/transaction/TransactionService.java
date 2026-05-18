@@ -26,6 +26,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
+    private final TransactionMapper transactionMapper;
 
     public TransactionResponse createTransaction(TransactionRequest request) {
 
@@ -44,31 +45,7 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return toResponse(savedTransaction);
-    }
-
-    private TransactionResponse toResponse(Transaction transaction) {
-
-        Category category = transaction.getCategory();
-
-        return new TransactionResponse(
-                transaction.getId(),
-                transaction.getAmount(),
-                transaction.getDescription(),
-                transaction.getDate(),
-                category.getId(),
-                category.getName(),
-                category.getType()
-        );
-    }
-
-    public List<TransactionResponse> getAllTransactions() {
-
-        User currentUser = currentUserService.getCurrentUser();
-        return transactionRepository.findByUser(currentUser)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        return transactionMapper.toResponse(savedTransaction);
     }
 
     public TransactionResponse getTransactionById(Long id) {
@@ -78,7 +55,7 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
-        return toResponse(transaction);
+        return transactionMapper.toResponse(transaction);
     }
 
     @Transactional
@@ -110,7 +87,7 @@ public class TransactionService {
 
         Transaction updatedTransaction = transactionRepository.save(transaction);
 
-        return toResponse(updatedTransaction);
+        return transactionMapper.toResponse(updatedTransaction);
     }
 
     public TransactionSummaryResponse getSummary(LocalDateTime start, LocalDateTime end) {
@@ -153,14 +130,14 @@ public class TransactionService {
             spec = spec.and(TransactionSpecification.hasCategoryType(type));
         }
         if (start != null && end != null){
-            spec = spec.and(TransactionSpecification.hasCDateBetween(start, end));
+            spec = spec.and(TransactionSpecification.hasDateBetween(start, end));
         }
 
         Page<Transaction> transactionsPage = transactionRepository.findAll(spec, pageable);
 
         List<TransactionResponse> content = transactionsPage.getContent()
                 .stream()
-                .map(this::toResponse)
+                .map(transactionMapper::toResponse)
                 .toList();
 
         return new PagedResponse<>(
