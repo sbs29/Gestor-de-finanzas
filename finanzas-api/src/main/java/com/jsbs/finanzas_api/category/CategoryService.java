@@ -2,9 +2,11 @@ package com.jsbs.finanzas_api.category;
 
 import com.jsbs.finanzas_api.common.exception.CategoryNotFoundException;
 import com.jsbs.finanzas_api.security.CurrentUserService;
+import com.jsbs.finanzas_api.transaction.TransactionRepository;
 import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,19 +15,21 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-
+    private final TransactionRepository transactionRepository;
     private final CurrentUserService currentUserService;
-
     private final CategoryMapper categoryMapper;
 
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
         User currentUser = currentUserService.getCurrentUser();
+
         return categoryRepository.findByUser(currentUser)
                 .stream()
                 .map(categoryMapper::toResponse)
                 .toList();
     }
 
+    @Transactional
     public CategoryResponse createCategory(CategoryRequest request) {
         User currentUser = currentUserService.getCurrentUser();
 
@@ -40,11 +44,39 @@ public class CategoryService {
         return categoryMapper.toResponse(savedCategory);
     }
 
+    @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
+        User currentUser = currentUserService.getCurrentUser();
 
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() ->new CategoryNotFoundException(id));
+        Category category = categoryRepository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
 
         return categoryMapper.toResponse(category);
     }
+
+    @Transactional
+    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
+        User currentUser = currentUserService.getCurrentUser();
+
+        Category category = categoryRepository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+
+        category.setName(request.name());
+        category.setType(request.type());
+
+        Category updatedCategory = categoryRepository.save(category);
+
+        return categoryMapper.toResponse(updatedCategory);
+    }
+
+    @Transactional
+    public void deleteCategory(Long id) {
+        User currentUser = currentUserService.getCurrentUser();
+
+        Category category = categoryRepository.findByIdAndUser(id, currentUser)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+
+        categoryRepository.delete(category);
+    }
+
 }

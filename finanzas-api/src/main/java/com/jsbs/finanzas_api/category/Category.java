@@ -1,21 +1,16 @@
 package com.jsbs.finanzas_api.category;
 
-import com.jsbs.finanzas_api.transaction.Transaction;
 import com.jsbs.finanzas_api.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 @Builder
 @Table(name = "categories")
 public class Category {
@@ -33,8 +28,7 @@ public class Category {
     @Column(nullable = false)
     private CategoryType type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 }

@@ -5,6 +5,7 @@ import com.jsbs.finanzas_api.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Builder
 @Table(name = "transactions")
 public class Transaction {
@@ -26,6 +26,7 @@ public class Transaction {
     private Long id;
 
     @NotNull(message = "El importe es obligatorio")
+    @Positive(message = "El importe debe ser mayor que cero")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
@@ -38,11 +39,13 @@ public class Transaction {
     private LocalDateTime date;
 
     @NotNull(message = "La categoría es obligatoria")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne
+    @NotNull(message = "El usuario es obligatorio")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
 }

@@ -4,7 +4,6 @@ import com.jsbs.finanzas_api.auth.PagedResponse;
 import com.jsbs.finanzas_api.category.CategoryType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -59,8 +57,7 @@ public class TransactionController {
     @GetMapping("/summary/week")
     public TransactionSummaryResponse getCurrentWeekSummary() {
         LocalDate today = LocalDate.now();
-        DayOfWeek firstDayConfig = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-        LocalDate startDate = today.with(TemporalAdjusters.previousOrSame(firstDayConfig));
+        LocalDate startDate = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = startDate.plusDays(6);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.atTime(LocalTime.MAX);

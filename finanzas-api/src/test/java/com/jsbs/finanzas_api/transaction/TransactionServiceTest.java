@@ -82,7 +82,7 @@ class TransactionServiceTest {
         LocalDateTime end = LocalDateTime.now();
 
         when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(transactionRepository.findByUserAndDateBetween(user, start, end))
+        when(transactionRepository.findByUserIdAndDateBetween(user.getId(), start, end))
                 .thenReturn(transactions);
 
         // act
@@ -99,7 +99,7 @@ class TransactionServiceTest {
         verify(currentUserService).getCurrentUser();
 
         verify(transactionRepository)
-                .findByUserAndDateBetween(user, start, end);
+                .findByUserIdAndDateBetween(user.getId(), start, end);
     }
 
     @Test
@@ -117,7 +117,7 @@ class TransactionServiceTest {
                 .build();
 
         when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(transactionRepository.findByIdAndUser(transactionId, user))
+        when(transactionRepository.findByIdAndUserId(transactionId, user.getId()))
                 .thenReturn(Optional.empty());
 
         // act + assert
@@ -127,6 +127,6 @@ class TransactionServiceTest {
         ).isInstanceOf(TransactionNotFoundException.class);
 
         verify(currentUserService).getCurrentUser();
-        verify(transactionRepository).findByIdAndUser(transactionId, user);
+        verify(transactionRepository).findByIdAndUserId(transactionId, user.getId());
     }
 }

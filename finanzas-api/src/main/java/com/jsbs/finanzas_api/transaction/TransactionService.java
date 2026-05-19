@@ -32,8 +32,10 @@ public class TransactionService {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() ->new CategoryNotFoundException(request.categoryId()));
+        Category category = categoryRepository.findByIdAndUser(
+                request.categoryId(),
+                currentUser
+        ).orElseThrow(() -> new CategoryNotFoundException(request.categoryId()));
 
         Transaction transaction = Transaction.builder()
                 .amount(request.amount())
@@ -48,11 +50,12 @@ public class TransactionService {
         return transactionMapper.toResponse(savedTransaction);
     }
 
+    @Transactional(readOnly = true)
     public TransactionResponse getTransactionById(Long id) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
+        Transaction transaction = transactionRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         return transactionMapper.toResponse(transaction);
@@ -63,7 +66,7 @@ public class TransactionService {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
+        Transaction transaction = transactionRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         transactionRepository.delete(transaction);
@@ -74,11 +77,13 @@ public class TransactionService {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
+        Transaction transaction = transactionRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
-        Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId()));
+        Category category = categoryRepository.findByIdAndUser(
+                request.categoryId(),
+                currentUser
+        ).orElseThrow(() -> new CategoryNotFoundException(request.categoryId()));
 
         transaction.setAmount(request.amount());
         transaction.setDescription(request.description());
@@ -90,11 +95,12 @@ public class TransactionService {
         return transactionMapper.toResponse(updatedTransaction);
     }
 
+    @Transactional(readOnly = true)
     public TransactionSummaryResponse getSummary(LocalDateTime start, LocalDateTime end) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        List<Transaction> transactions = transactionRepository.findByUserAndDateBetween(currentUser, start, end);
+        List<Transaction> transactions = transactionRepository.findByUserIdAndDateBetween(currentUser.getId(), start, end);
 
         BigDecimal income = BigDecimal.ZERO;
         BigDecimal expense = BigDecimal.ZERO;
@@ -116,6 +122,7 @@ public class TransactionService {
         );
     }
 
+    @Transactional(readOnly = true)
     public PagedResponse<TransactionResponse> getAllTransactions(
             Pageable pageable,
             CategoryType type,

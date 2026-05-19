@@ -1,9 +1,5 @@
 package com.jsbs.finanzas_api.transaction;
 
-import com.jsbs.finanzas_api.category.CategoryType;
-import com.jsbs.finanzas_api.user.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -14,15 +10,13 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         JpaSpecificationExecutor<Transaction> {
 
-    List<Transaction> findByUser(User user);
+    Optional<Transaction> findByIdAndUserId(Long id, Long userId);
 
-    Optional<Transaction> findByIdAndUser(Long id, User user);
+    List<Transaction> findByUserId(Long userId);
 
-    List<Transaction> findByUserAndDateBetween(
-            User user,
+    List<Transaction> findByUserIdAndDateBetween(
+            Long userId,
             LocalDateTime start,
             LocalDateTime end
     );
-
-    Page<Transaction> findByUser(User user, Pageable pageable);
 }

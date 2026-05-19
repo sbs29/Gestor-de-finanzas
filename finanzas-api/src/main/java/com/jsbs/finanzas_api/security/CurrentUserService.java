@@ -8,10 +8,14 @@ import org.springframework.stereotype.Service;
 public class CurrentUserService {
 
     public User getCurrentUser() {
-        return (User) SecurityContextHolder
+        var authentication = SecurityContextHolder
                 .getContext()
-                .getAuthentication()
-                .getPrincipal();
-    }
+                .getAuthentication();
 
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+
+        return user;
+    }
 }

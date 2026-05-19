@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleEmailExists(EmailAlreadyExistsException ex) {
         return new ErrorResponse(
                 400,
-                "Email already exists",
+                ex.getMessage(),
                 LocalDateTime.now(),
                 null
         );
@@ -71,6 +71,28 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 401,
                 ex.getMessage(),
+                LocalDateTime.now(),
+                null
+        );
+    }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handlerCategoryInUse(CategoryInUseException ex) {
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now(),
+                null
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGenericException(Exception ex) {
+        return new ErrorResponse(
+                500,
+                "Unexpected internal server error",
                 LocalDateTime.now(),
                 null
         );
