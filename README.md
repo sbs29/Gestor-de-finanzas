@@ -142,4 +142,3 @@ Swagger UI disponible en:
 - [ ] Frontend React
 - [ ] Integración Full Stack
 - [ ] Despliegue
-- [ ] Preparación entrevistas técnicas
