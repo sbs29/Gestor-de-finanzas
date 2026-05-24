@@ -13,6 +13,16 @@ target/
 .springBeans
 .sts4-cache
 
+### Environment ###
+.env
+.env.*
+!.env.example
+
+### Spring Profiles ###
+src/main/resources/application-local.properties
+src/main/resources/application-dev.properties
+src/main/resources/application-prod.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -32,6 +42,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### Env ###
-src/main/resources/application-local.properties
-.env
+### OS ###
+.DS_Store
+Thumbs.db
