@@ -100,6 +100,13 @@ Servicios incluidos:
 - PostgreSQL
 - Finanzas API
 
+### Ejecución
+
+```bash
+cd finanzas-api
+docker compose up --build
+```
+
 ---
 
 ## Documentación API
@@ -128,7 +135,7 @@ Swagger UI disponible en:
 
 ### Frontend React
 
-🚧 En desarrollo
+🚧 Próximamente
 
 ---
 
