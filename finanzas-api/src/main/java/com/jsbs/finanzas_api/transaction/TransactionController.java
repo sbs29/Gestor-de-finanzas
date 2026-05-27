@@ -5,6 +5,8 @@ import com.jsbs.finanzas_api.category.CategoryType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +67,7 @@ public class TransactionController {
 
     @GetMapping
     public PagedResponse<TransactionResponse> getAllTransactions(
+            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC)
             Pageable pageable,
             @RequestParam(required = false)CategoryType type,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
