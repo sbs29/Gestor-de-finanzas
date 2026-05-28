@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { createTransaction, deleteTransaction, getTransactions } from '../services/transactionService'
+import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from '../services/transactionService'
 import { getCategories } from '../services/categoryService'
 import type { Transaction } from '../types/Transaction'
 import type { Category } from '../types/Category'
@@ -15,6 +15,7 @@ function TransactionsPage() {
   const [categoryId, setCategoryId] = useState('')
   const [formMessage, setFormMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [editingTransactionId, setEditingTransactionId] = useState<number | null>(null)
 
   async function loadTransactions() {
     try {
@@ -68,17 +69,29 @@ function TransactionsPage() {
       setFormMessage('')
       setSubmitting(true)
 
-      await createTransaction({
-        description,
-        amount: Number(amount),
-        date: new Date(date).toISOString(),
-        categoryId: Number(categoryId)
-      })
+      if (editingTransactionId) {
+        await updateTransaction(editingTransactionId, {
+          description,
+          amount: Number(amount),
+          date: new Date(date).toISOString(),
+          categoryId: Number(categoryId)
+        })
 
+        setFormMessage('Transacción actualizada correctamente')
+      } else {
+        await createTransaction({
+          description,
+          amount: Number(amount),
+          date: new Date(date).toISOString(),
+          categoryId: Number(categoryId)
+        })
+
+        setFormMessage('Transacción creada correctamente')
+      }
       setDescription('')
       setAmount('')
       setDate('')
-      setFormMessage('Transacción creada correctamente')
+      setEditingTransactionId(null)
 
       await loadTransactions()
     } catch (error) {
@@ -108,6 +121,21 @@ function TransactionsPage() {
     }
   }
 
+  function handleStartEditTransaction(transaction: Transaction) {
+    setEditingTransactionId(transaction.id)
+
+    setDescription(transaction.description)
+
+    setAmount(String(transaction.amount))
+
+    setDate(transaction.date.slice(0,16))
+
+    setCategoryId(String(transaction.categoryId))
+
+    setFormMessage('')
+
+  }
+
   if (loading) {
     return <p>Cargando transacciones...</p>
   }
@@ -128,7 +156,13 @@ function TransactionsPage() {
       </div>
 
       <section className="card">
-        <h2>Nueva transacción</h2>
+        <h2>
+          {
+            editingTransactionId
+            ? 'Editar transacción'
+            : 'Nueva transacción'
+          }
+        </h2>
 
         <form onSubmit={handleCreateTransaction}>
           <div>
@@ -179,9 +213,27 @@ function TransactionsPage() {
             </select>
           </div>
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Creando...' : 'Crear transacción'}
+          <button type="submit" className='primary-button' disabled={submitting}>
+            {submitting
+              ? 'Guardando...'
+              : editingTransactionId
+                ? 'Actualizar transacción'
+                : 'Crear transacción'}
           </button>
+          {editingTransactionId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingTransactionId(null)
+                setDescription('')
+                setAmount('')
+                setDate('')
+                setFormMessage('')
+              }}
+            >
+              Cancelar edición
+            </button>
+          )}
         </form>
 
         {formMessage && (
@@ -242,13 +294,22 @@ function TransactionsPage() {
                   </td>
                   <td>{new Date(transaction.date).toLocaleString()}</td>
                   <td>
-                    <button
-                      type='button'
-                      className='danger-button'
-                      onClick={() => handleDeleteTransaction(transaction.id)}
-                    >
-                      Eliminar
-                    </button>
+                    <div className='table-actions'>
+                      <button
+                        type="button"
+                        className='edit-button'
+                        onClick={() => handleStartEditTransaction(transaction)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type='button'
+                        className='danger-button'
+                        onClick={() => handleDeleteTransaction(transaction.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

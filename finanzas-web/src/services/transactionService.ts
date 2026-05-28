@@ -19,3 +19,15 @@ export async function createTransaction(request: CreateTransactionRequest): Prom
 export async function deleteTransaction(id:number): Promise<void> {
   await apiClient.delete(`/transactions/${id}`)
 }
+
+export async function updateTransaction(
+  id:number,
+  request: CreateTransactionRequest
+): Promise<Transaction> {
+  const response = await apiClient.put<Transaction>(
+    `/transactions/${id}`,
+    request
+  )
+
+  return response.data
+}

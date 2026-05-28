@@ -138,7 +138,7 @@ function CategoriesPage() {
             </select>
           </div>
 
-          <button type="submit" disabled={submitting}>
+          <button type="submit" className='primary-button' disabled={submitting}>
             {submitting
               ? 'Guardando...'
               : editingCategoryId
@@ -204,19 +204,22 @@ function CategoriesPage() {
                     </span>
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      className="danger-button"
-                      onClick={() => handleDeleteCategory(category.id)}
-                    >
-                      Eliminar
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => handleStartEditCategory(category)}
-                    >
-                      Editar
-                    </button>
+                    <div className='table-actions'>
+                      <button
+                        type='button'
+                        className='edit-button'
+                        onClick={() => handleStartEditCategory(category)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="danger-button"
+                        onClick={() => handleDeleteCategory(category.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
