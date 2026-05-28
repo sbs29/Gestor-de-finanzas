@@ -177,7 +177,9 @@ function CategoriesPage() {
         <h2>Listado de categorías</h2>
 
         {categories.length === 0 ? (
-          <p>No hay categorías registradas.</p>
+          <div className="empty-state">
+            <p>No hay categorías registradas.</p>
+          </div>
         ) : (
           <table>
             <thead>

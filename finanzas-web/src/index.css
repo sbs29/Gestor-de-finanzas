@@ -362,3 +362,33 @@ nav {
   gap: 0.5rem;
   align-items: center;
 }
+
+/* =========================
+   EMPTY STATES
+========================= */
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+  background-color: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.75rem;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.pagination span {
+  color: #6b7280;
+  font-weight: 500;
+}

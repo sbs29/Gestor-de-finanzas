@@ -2,9 +2,18 @@ import { apiClient } from '../api/apiClient'
 import type { CreateTransactionRequest, Transaction } from '../types/Transaction'
 import type { PagedResponse } from '../types/PagedResponse'
 
-export async function getTransactions(): Promise<PagedResponse<Transaction>> {
+export async function getTransactions(
+  page = 0,
+  size = 10
+): Promise<PagedResponse<Transaction>> {
   const response = await apiClient.get<PagedResponse<Transaction>>(
-    '/transactions'
+    '/transactions',
+    {
+      params: {
+        page,
+        size
+      }
+    }
   )
 
   return response.data

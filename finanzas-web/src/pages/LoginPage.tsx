@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 
 function LoginPage() {
-  const [email, setEmail] = useState('sebas@gmail.com')
+  const [email, setEmail] = useState('demo@finanzas.com')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
   const navigate = useNavigate()

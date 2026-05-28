@@ -16,11 +16,24 @@ function TransactionsPage() {
   const [formMessage, setFormMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [editingTransactionId, setEditingTransactionId] = useState<number | null>(null)
+  const [filterType, setFilterType] = useState('ALL')
+  const filteredTransactions =
+    filterType === 'ALL'
+      ? transactions
+      : transactions.filter(
+          transaction => transaction.categoryType === filterType
+        )
+  const [page, setPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
 
   async function loadTransactions() {
     try {
-      const data = await getTransactions()
+      const data = await getTransactions(page)
+
       setTransactions(data.content)
+      setTotalPages(data.totalPages)
+      setTotalElements(data.totalElements)
     } catch (error) {
       setError('No se pudieron cargar las transacciones')
     } finally {
@@ -40,7 +53,7 @@ function TransactionsPage() {
   useEffect(() => {
     loadTransactions()
     loadCategories()
-  }, [])
+  }, [page])
 
   async function handleCreateTransaction(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -152,7 +165,7 @@ function TransactionsPage() {
           <p>Gestiona tus ingresos y gastos registrados.</p>
         </div>
 
-        <span className="badge">Total: {transactions.length}</span>
+        <span className="badge">Total: {totalElements}</span>
       </div>
 
       <section className="card">
@@ -250,10 +263,25 @@ function TransactionsPage() {
       </section>
 
       <section className="card">
+        <h2>Filtros</h2>
+
+        <select
+          value={filterType}
+          onChange={(event) => setFilterType(event.target.value)}
+        >
+          <option value="ALL">Todas</option>
+          <option value="INCOME">Ingresos</option>
+          <option value="EXPENSE">Gastos</option>
+        </select>
+      </section>
+
+      <section className="card">
         <h2>Historial</h2>
 
-        {transactions.length === 0 ? (
-          <p>No hay transacciones registradas.</p>
+        {filteredTransactions.length === 0 ? (
+          <div className="empty-state">
+            <p>No hay transacciones registradas.</p>
+          </div>
         ) : (
           <table>
             <thead>
@@ -268,7 +296,7 @@ function TransactionsPage() {
             </thead>
 
             <tbody>
-              {transactions.map(transaction => (
+              {filteredTransactions.map(transaction => (
                 <tr key={transaction.id}>
                   <td>{transaction.description}</td>
                   <td
@@ -316,6 +344,29 @@ function TransactionsPage() {
             </tbody>
           </table>
         )}
+        <div className="pagination">
+            <button
+              type="button"
+              className="primary-button"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+            >
+              Anterior
+            </button>
+
+            <span>
+              Página {page + 1} de {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="primary-button"
+              disabled={page + 1 >= totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Siguiente
+            </button>
+          </div>
       </section>
     </section>
   )
