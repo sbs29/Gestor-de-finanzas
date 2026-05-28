@@ -14,6 +14,7 @@ function TransactionsPage() {
   const [date, setDate] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [formMessage, setFormMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   async function loadTransactions() {
     try {
@@ -43,8 +44,29 @@ function TransactionsPage() {
   async function handleCreateTransaction(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
+    if (!description.trim()) {
+      setFormMessage('La descripción es obligatoria')
+      return
+    }
+
+    if (!amount || Number(amount) <= 0) {
+      setFormMessage('La cantidad debe ser mayor que 0')
+      return
+    }
+
+    if (!date) {
+      setFormMessage('La fecha es obligatoria')
+      return
+    }
+
+    if (!categoryId) {
+      setFormMessage('La categoría es obligatoria')
+      return
+    }
+
     try {
       setFormMessage('')
+      setSubmitting(true)
 
       await createTransaction({
         description,
@@ -61,6 +83,8 @@ function TransactionsPage() {
       await loadTransactions()
     } catch (error) {
       setFormMessage('No se pudo crear la transacción')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -94,6 +118,7 @@ function TransactionsPage() {
               type="text"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
+              placeholder="Ej: Supermercado, gasolina, nómina..."
             />
           </div>
 
@@ -105,6 +130,7 @@ function TransactionsPage() {
               step="0.01"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
+              placeholder="Ej: 25.50"
             />
           </div>
 
@@ -133,12 +159,22 @@ function TransactionsPage() {
             </select>
           </div>
 
-          <button type="submit">
-            Crear transacción
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Creando...' : 'Crear transacción'}
           </button>
         </form>
 
-        {formMessage && <p className="form-message">{formMessage}</p>}
+        {formMessage && (
+          <p
+            className={
+              formMessage.includes('correctamente')
+                ? 'form-message'
+                : 'error-message'
+            }
+          >
+            {formMessage}
+          </p>
+        )}
       </section>
 
       <section className="card">

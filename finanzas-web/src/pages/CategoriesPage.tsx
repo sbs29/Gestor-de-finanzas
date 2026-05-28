@@ -9,6 +9,7 @@ function CategoriesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [formMessage, setFormMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   async function loadCategories() {
     try {
@@ -28,7 +29,13 @@ function CategoriesPage() {
   async function handleCreateCategory(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
+    if (!name.trim()) {
+      setFormMessage('El nombre es obligatorio')
+      return
+    }
+
     try {
+      setSubmitting(true)
       setFormMessage('')
 
       await createCategory({
@@ -43,6 +50,8 @@ function CategoriesPage() {
       await loadCategories()
     } catch (error) {
       setFormMessage('No se pudo crear la categoría')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -76,6 +85,7 @@ function CategoriesPage() {
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              placeholder="Ej: Comida, transporte, salario..."
             />
           </div>
 
@@ -91,12 +101,22 @@ function CategoriesPage() {
             </select>
           </div>
 
-          <button type="submit">
-            Crear categoría
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Creando...' : 'Crear categoría'}
           </button>
         </form>
 
-        {formMessage && <p className="form-message">{formMessage}</p>}
+        {formMessage && (
+          <p
+            className={
+              formMessage.includes('correctamente')
+                ? 'form-message'
+                : 'error-message'
+            }
+          >
+            {formMessage}
+          </p>
+        )}
       </section>
 
       <section className="card">
