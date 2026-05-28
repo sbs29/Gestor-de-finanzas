@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { createCategory, getCategories } from '../services/categoryService'
+import { createCategory, getCategories, deleteCategory } from '../services/categoryService'
 import type { Category, CategoryType } from '../types/Category'
 
 function CategoriesPage() {
@@ -52,6 +52,24 @@ function CategoriesPage() {
       setFormMessage('No se pudo crear la categoría')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleDeleteCategory(id: number) {
+    const confirmed = window.confirm(
+      '¿Seguro que deseas eliminar esta categoría?'
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await deleteCategory(id)
+
+      await loadCategories()
+    } catch (error) {
+      setFormMessage('No se puede eliminar una categoría con transacciones asociadas')
     }
   }
 
@@ -130,6 +148,7 @@ function CategoriesPage() {
               <tr>
                 <th>Nombre</th>
                 <th>Tipo</th>
+                <th>Acciones</th>
               </tr>
             </thead>
 
@@ -147,6 +166,15 @@ function CategoriesPage() {
                     >
                       {category.type}
                     </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="danger-button"
+                      onClick={() => handleDeleteCategory(category.id)}
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}

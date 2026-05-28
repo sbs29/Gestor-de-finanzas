@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { createTransaction, getTransactions } from '../services/transactionService'
+import { createTransaction, deleteTransaction, getTransactions } from '../services/transactionService'
 import { getCategories } from '../services/categoryService'
 import type { Transaction } from '../types/Transaction'
 import type { Category } from '../types/Category'
@@ -85,6 +85,26 @@ function TransactionsPage() {
       setFormMessage('No se pudo crear la transacción')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleDeleteTransaction(id:number) {
+    const confirmed = window.confirm(
+      '¿Seguro que deseas eliminar esta transacción?'
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await deleteTransaction(id)
+
+      setFormMessage('Transacción eliminada correctamente')
+
+      await loadTransactions()
+    } catch (error) {
+      setFormMessage('No se pudo eliminar la transacción')
     }
   }
 
@@ -191,6 +211,7 @@ function TransactionsPage() {
                 <th>Categoría</th>
                 <th>Tipo</th>
                 <th>Fecha</th>
+                <th>Acciones</th>
               </tr>
             </thead>
 
@@ -220,6 +241,15 @@ function TransactionsPage() {
                     </span>
                   </td>
                   <td>{new Date(transaction.date).toLocaleString()}</td>
+                  <td>
+                    <button
+                      type='button'
+                      className='danger-button'
+                      onClick={() => handleDeleteTransaction(transaction.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

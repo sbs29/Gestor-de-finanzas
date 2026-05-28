@@ -1,7 +1,9 @@
 package com.jsbs.finanzas_api.category;
 
+import com.jsbs.finanzas_api.common.exception.CategoryInUseException;
 import com.jsbs.finanzas_api.common.exception.CategoryNotFoundException;
 import com.jsbs.finanzas_api.security.CurrentUserService;
+import com.jsbs.finanzas_api.transaction.TransactionRepository;
 import com.jsbs.finanzas_api.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
     private final CurrentUserService currentUserService;
     private final CategoryMapper categoryMapper;
 
@@ -69,6 +72,12 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(Long id) {
+        if (transactionRepository.existsByCategoryId(id)) {
+            throw new CategoryInUseException(
+                    "Cannot delete category because it has associated transactions"
+            );
+        }
+
         User currentUser = currentUserService.getCurrentUser();
 
         Category category = categoryRepository.findByIdAndUser(id, currentUser)

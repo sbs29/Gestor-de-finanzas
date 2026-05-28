@@ -15,3 +15,7 @@ export async function createTransaction(request: CreateTransactionRequest): Prom
 
   return response.data
 }
+
+export async function deleteTransaction(id:number): Promise<void> {
+  await apiClient.delete(`/transactions/${id}`)
+}

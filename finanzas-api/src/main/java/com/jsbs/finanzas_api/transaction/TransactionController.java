@@ -81,6 +81,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteTransactionById(@PathVariable Long id) {
         transactionService.deleteTransactionById(id);
         return ResponseEntity.noContent().build();

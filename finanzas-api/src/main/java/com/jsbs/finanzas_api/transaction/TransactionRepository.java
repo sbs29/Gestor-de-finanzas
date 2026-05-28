@@ -19,4 +19,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             LocalDateTime start,
             LocalDateTime end
     );
+
+    boolean existsByCategoryId(Long categoryId);
 }

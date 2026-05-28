@@ -17,3 +17,7 @@ export async function createCategory(
 
   return response.data
 }
+
+export async function deleteCategory(id:number): Promise<void> {
+  await apiClient.delete(`/categories/${id}`)
+}
