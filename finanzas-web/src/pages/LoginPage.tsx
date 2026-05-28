@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 
 function LoginPage() {
   const [email, setEmail] = useState('sebas@gmail.com')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
+  const navigate = useNavigate()
 
   async function handleLogin() {
     try {
@@ -16,35 +18,73 @@ function LoginPage() {
       localStorage.setItem('token', response.token)
 
       setMessage('Login correcto. Token guardado.')
+
+      navigate('/transactions')
     } catch (error) {
       setMessage('Login incorrecto')
     }
   }
 
   return (
-    <>
-      <h1>Login</h1>
+    <section className="page">
+      <div className="page-header">
+        <div>
+          <h1>Login</h1>
+          <p>Accede a tu cuenta para gestionar tus finanzas.</p>
+        </div>
+      </div>
 
-      <input
-        type="email"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-        placeholder="Email"
-      />
+      <section className="card">
+        <h2>Iniciar sesión</h2>
 
-      <input
-        type="password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder="Password"
-      />
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            handleLogin()
+          }}
+        >
+          <div>
+            <label htmlFor="email">Email</label>
 
-      <button onClick={handleLogin}>
-        Login
-      </button>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email"
+            />
+          </div>
 
-      {message && <p>{message}</p>}
-    </>
+          <div>
+            <label htmlFor="password">Password</label>
+
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password"
+            />
+          </div>
+
+          <button type="submit">
+            Login
+          </button>
+        </form>
+
+        {message && (
+          <p
+            className={
+              message.includes('correcto')
+                ? 'form-message'
+                : 'error-message'
+            }
+          >
+            {message}
+          </p>
+        )}
+      </section>
+    </section>
   )
 }
 

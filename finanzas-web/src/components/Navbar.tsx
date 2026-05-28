@@ -1,50 +1,40 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom'
 
 function Navbar() {
+  const navigate = useNavigate()
+  const token = localStorage.getItem('token')
 
-    const navigate = useNavigate()
-    const token = localStorage.getItem('token')
+  function handleLogout() {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
 
-    function handleLogout() {
-        localStorage.removeItem('token')
-        navigate('/login')
-    }
+  return (
+    <header className="app-header">
+      <div className="app-header__content">
+        <Link to="/" className="app-logo">
+          Finanzas App
+        </Link>
 
-    return (
+        <nav className="app-nav">
+          <Link to="/">Home</Link>
+          <Link to="/login">Login</Link>
 
-        <nav>
+          {token && (
+            <>
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/transactions">Transactions</Link>
+              <Link to="/categories">Categories</Link>
 
-            <Link to="/">Home</Link>
-
-            {' | '}
-
-            <Link to="/login">Login</Link>
-
-            {' | '}
-
-            <Link to="/dashboard">Dashboard</Link>
-
-            {' | '}
-
-            <Link to="/transactions">Transactions</Link>
-
-            {' | '}
-
-            <Link to="/categories">Categories</Link>
-
-            {token && (
-                <>
-                    {' | '}
-                    <button onClick={handleLogout}>
-                        Logout
-                    </button>
-                </>
-            )}
-
+              <button type="button" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          )}
         </nav>
-
-    )
-
+      </div>
+    </header>
+  )
 }
 
 export default Navbar

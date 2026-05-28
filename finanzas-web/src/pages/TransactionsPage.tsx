@@ -73,93 +73,124 @@ function TransactionsPage() {
   }
 
   return (
-    <>
-      <h1>Transacciones</h1>
-
-      <p>Total: {transactions.length}</p>
-
-      <form onSubmit={handleCreateTransaction}>
+    <section className="page">
+      <div className="page-header">
         <div>
-          <label htmlFor="description">Descripción</label>
-          <input
-            id="description"
-            type="text"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
+          <h1>Transacciones</h1>
+          <p>Gestiona tus ingresos y gastos registrados.</p>
         </div>
 
-        <div>
-          <label htmlFor="amount">Cantidad</label>
-          <input
-            id="amount"
-            type="number"
-            step="0.01"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-          />
-        </div>
+        <span className="badge">Total: {transactions.length}</span>
+      </div>
 
-        <div>
-          <label htmlFor="date">Fecha</label>
-          <input
-            id="date"
-            type="datetime-local"
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-          />
-        </div>
+      <section className="card">
+        <h2>Nueva transacción</h2>
 
-        <div>
-          <label htmlFor="category">Categoría</label>
-          <select
-            id="category"
-            value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-          >
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.name} - {category.type}
-              </option>
-            ))}
-          </select>
-        </div>
+        <form onSubmit={handleCreateTransaction}>
+          <div>
+            <label htmlFor="description">Descripción</label>
+            <input
+              id="description"
+              type="text"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </div>
 
-        <button type="submit">
-          Crear transacción
-        </button>
-      </form>
+          <div>
+            <label htmlFor="amount">Cantidad</label>
+            <input
+              id="amount"
+              type="number"
+              step="0.01"
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
+            />
+          </div>
 
-      {formMessage && <p>{formMessage}</p>}
+          <div>
+            <label htmlFor="date">Fecha</label>
+            <input
+              id="date"
+              type="datetime-local"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+            />
+          </div>
 
-      {transactions.length === 0 ? (
-        <p>No hay transacciones registradas.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Descripción</th>
-              <th>Cantidad</th>
-              <th>Categoría</th>
-              <th>Tipo</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
+          <div>
+            <label htmlFor="category">Categoría</label>
+            <select
+              id="category"
+              value={categoryId}
+              onChange={(event) => setCategoryId(event.target.value)}
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name} - {category.type}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <tbody>
-            {transactions.map(transaction => (
-              <tr key={transaction.id}>
-                <td>{transaction.description}</td>
-                <td>{transaction.amount}€</td>
-                <td>{transaction.categoryName}</td>
-                <td>{transaction.categoryType}</td>
-                <td>{new Date(transaction.date).toLocaleString()}</td>
+          <button type="submit">
+            Crear transacción
+          </button>
+        </form>
+
+        {formMessage && <p className="form-message">{formMessage}</p>}
+      </section>
+
+      <section className="card">
+        <h2>Historial</h2>
+
+        {transactions.length === 0 ? (
+          <p>No hay transacciones registradas.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Categoría</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </>
+            </thead>
+
+            <tbody>
+              {transactions.map(transaction => (
+                <tr key={transaction.id}>
+                  <td>{transaction.description}</td>
+                  <td
+                    className={
+                      transaction.categoryType === 'INCOME'
+                        ? 'amount income'
+                        : 'amount expense'
+                    }>
+                    {transaction.categoryType === 'INCOME' ? '+' : '-'}
+                    {Math.abs(transaction.amount).toFixed(2)} €
+                  </td>
+                  <td>{transaction.categoryName}</td>
+                  <td>
+                    <span
+                      className={
+                        transaction.categoryType === 'INCOME'
+                          ? 'type-badge income-badge'
+                          : 'type-badge expense-badge'
+                      }
+                    >
+                      {transaction.categoryType}
+                    </span>
+                  </td>
+                  <td>{new Date(transaction.date).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+    </section>
   )
 }
 
