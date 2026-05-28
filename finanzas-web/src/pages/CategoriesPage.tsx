@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { createCategory, getCategories, deleteCategory } from '../services/categoryService'
+import { createCategory, deleteCategory, getCategories, updateCategory } from '../services/categoryService'
 import type { Category, CategoryType } from '../types/Category'
 
 function CategoriesPage() {
@@ -10,6 +10,7 @@ function CategoriesPage() {
   const [error, setError] = useState('')
   const [formMessage, setFormMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null)
 
   async function loadCategories() {
     try {
@@ -38,14 +39,25 @@ function CategoriesPage() {
       setSubmitting(true)
       setFormMessage('')
 
-      await createCategory({
-        name,
-        type
-      })
+      if (editingCategoryId) {
+        await updateCategory(editingCategoryId, {
+          name,
+          type
+        })
+
+        setFormMessage('Categoría actualizada correctamente')
+      } else {
+        await createCategory({
+          name,
+          type
+        })
+
+        setFormMessage('Categoría creada correctamente')
+      }
 
       setName('')
       setType('EXPENSE')
-      setFormMessage('Categoría creada correctamente')
+      setEditingCategoryId(null)
 
       await loadCategories()
     } catch (error) {
@@ -73,6 +85,13 @@ function CategoriesPage() {
     }
   }
 
+  function handleStartEditCategory(category: Category) {
+    setEditingCategoryId(category.id)
+    setName(category.name)
+    setType(category.type)
+    setFormMessage('')
+  }
+
   if (loading) {
     return <p>Cargando categorías...</p>
   }
@@ -93,7 +112,7 @@ function CategoriesPage() {
       </div>
 
       <section className="card">
-        <h2>Nueva categoría</h2>
+        <h2>{editingCategoryId ? 'Editar categoría' : 'Nueva categoría'}</h2>
 
         <form onSubmit={handleCreateCategory}>
           <div>
@@ -120,8 +139,25 @@ function CategoriesPage() {
           </div>
 
           <button type="submit" disabled={submitting}>
-            {submitting ? 'Creando...' : 'Crear categoría'}
+            {submitting
+              ? 'Guardando...'
+              : editingCategoryId
+                ? 'Actualizar categoría'
+                : 'Crear categoría'}
           </button>
+          {editingCategoryId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingCategoryId(null)
+                setName('')
+                setType('EXPENSE')
+                setFormMessage('')
+              }}
+            >
+              Cancelar edición
+            </button>
+          )}
         </form>
 
         {formMessage && (
@@ -174,6 +210,12 @@ function CategoriesPage() {
                       onClick={() => handleDeleteCategory(category.id)}
                     >
                       Eliminar
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => handleStartEditCategory(category)}
+                    >
+                      Editar
                     </button>
                   </td>
                 </tr>
