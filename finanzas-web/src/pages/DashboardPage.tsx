@@ -39,6 +39,14 @@ function DashboardPage() {
       startDate.setMonth(now.getMonth() - 1)
     }
 
+    if (period === 'THREE_MONTHS') {
+      startDate.setMonth(now.getMonth() - 3)
+    }
+
+    if (period === 'SIX_MONTHS') {
+      startDate.setMonth(now.getMonth() - 6)
+    }
+
     if (period === 'YEAR') {
       startDate.setFullYear(now.getFullYear() - 1)
     }
@@ -127,6 +135,8 @@ function DashboardPage() {
               <option value="WEEK">Última semana</option>
               <option value="FORTNIGHT">Última quincena</option>
               <option value="MONTH">Último mes</option>
+              <option value="THREE_MONTHS">Últimos 3 meses</option>
+              <option value="SIX_MONTHS">Últimos 6 meses</option>
               <option value="YEAR">Último año</option>
             </select>
           </div>
