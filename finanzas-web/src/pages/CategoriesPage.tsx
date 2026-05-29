@@ -1,6 +1,7 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { createCategory, deleteCategory, getCategories, updateCategory } from '../services/categoryService'
 import type { Category, CategoryType } from '../types/Category'
+import PageHeader from '../components/PageHeader'
 
 function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -102,14 +103,11 @@ function CategoriesPage() {
 
   return (
     <section className="page">
-      <div className="page-header">
-        <div>
-          <h1>Categorías</h1>
-          <p>Organiza tus ingresos y gastos por tipo.</p>
-        </div>
-
-        <span className="badge">Total: {categories.length}</span>
-      </div>
+      <PageHeader
+        title="Categorías"
+        description="Organiza tus ingresos y gastos por tipo."
+        badgeText={`Total: ${categories.length}`}
+      />
 
       <section className="card">
         <h2>{editingCategoryId ? 'Editar categoría' : 'Nueva categoría'}</h2>

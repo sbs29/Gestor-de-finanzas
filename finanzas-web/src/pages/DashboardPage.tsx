@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { getTransactions } from '../services/transactionService'
 import type { Transaction } from '../types/Transaction'
+import PageHeader from '../components/PageHeader'
+import MetricCard from '../components/MetricCard'
 
 function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -110,16 +112,11 @@ function DashboardPage() {
 
   return (
     <section className="page">
-      <div className="page-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Resumen general de tu actividad financiera.</p>
-        </div>
-
-        <span className="badge">
-          {periodTransactions.length} transacciones
-        </span>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Resumen general de tu actividad financiera."
+        badgeText={`${periodTransactions.length} transacciones`}
+      />
 
       <section className="card">
         <h2>Período</h2>
@@ -144,33 +141,34 @@ function DashboardPage() {
       </section>
 
       <section className="dashboard-grid">
-        <article className="card">
-          <h2>Balance</h2>
-          <p className={balance >= 0 ? 'amount income' : 'amount expense'}>
-            {balance.toFixed(2)} €
-          </p>
-        </article>
 
-        <article className="card">
-          <h2>Ingresos</h2>
-          <p className="amount income">
-            +{totalIncome.toFixed(2)} €
-          </p>
-        </article>
+        <MetricCard
+          title="Balance"
+          value={`${balance.toFixed(2)} €`}
+          className={
+            balance >= 0
+              ? 'amount income'
+              : 'amount expense'
+          }
+        />
 
-        <article className="card">
-          <h2>Gastos</h2>
-          <p className="amount expense">
-            -{totalExpense.toFixed(2)} €
-          </p>
-        </article>
+        <MetricCard
+          title="Ingresos"
+          value={`+${totalIncome.toFixed(2)} €`}
+          className="amount income"
+        />
 
-        <article className="card">
-          <h2>Total transacciones</h2>
-          <p className="amount">
-            {periodTransactions.length}
-          </p>
-        </article>
+        <MetricCard
+          title="Gastos"
+          value={`-${totalExpense.toFixed(2)} €`}
+          className="amount expense"
+        />
+
+        <MetricCard
+          title="Total transacciones"
+          value={periodTransactions.length.toString()}
+        />
+        
       </section>
 
       <section className="card">

@@ -3,6 +3,7 @@ import { createTransaction, deleteTransaction, getTransactions, updateTransactio
 import { getCategories } from '../services/categoryService'
 import type { Transaction } from '../types/Transaction'
 import type { Category } from '../types/Category'
+import PageHeader from '../components/PageHeader'
 
 function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -169,14 +170,11 @@ function TransactionsPage() {
 
   return (
     <section className="page">
-      <div className="page-header">
-        <div>
-          <h1>Transacciones</h1>
-          <p>Gestiona tus ingresos y gastos registrados.</p>
-        </div>
-
-        <span className="badge">Total: {totalElements}</span>
-      </div>
+      <PageHeader
+        title="Transacciones"
+        description="Gestiona tus ingresos y gastos registrados."
+        badgeText={`Total: ${totalElements}`}
+      />
 
       <section className="card">
         <h2>
