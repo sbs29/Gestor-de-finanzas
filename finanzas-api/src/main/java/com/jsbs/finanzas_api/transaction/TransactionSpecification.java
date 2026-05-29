@@ -18,6 +18,11 @@ public class TransactionSpecification {
                 criteriaBuilder.equal(root.get("category").get("type"), type);
     }
 
+    public static Specification<Transaction> hasCategoryId(Long categoryId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+    }
+
     public static Specification<Transaction> hasDateBetween(LocalDateTime start, LocalDateTime end) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.between(root.get("date"), start, end);

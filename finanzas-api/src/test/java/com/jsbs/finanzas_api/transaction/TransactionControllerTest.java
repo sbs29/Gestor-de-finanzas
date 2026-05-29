@@ -65,7 +65,7 @@ class TransactionControllerTest {
                 true
         );
 
-        when(transactionService.getAllTransactions(any(Pageable.class), isNull(), isNull(), isNull()))
+        when(transactionService.getAllTransactions(any(Pageable.class), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(response);
 
         mockMvc.perform(get("/api/transactions"))

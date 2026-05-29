@@ -69,10 +69,22 @@ public class TransactionController {
     public PagedResponse<TransactionResponse> getAllTransactions(
             @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC)
             Pageable pageable,
-            @RequestParam(required = false)CategoryType type,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        return transactionService.getAllTransactions(pageable, type, start, end);
+            @RequestParam(required = false) CategoryType type,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime start,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime end
+    ) {
+        return transactionService.getAllTransactions(
+                pageable,
+                type,
+                categoryId,
+                start,
+                end
+        );
     }
 
     @GetMapping("/{id}")

@@ -4,14 +4,22 @@ import type { PagedResponse } from '../types/PagedResponse'
 
 export async function getTransactions(
   page = 0,
-  size = 10
+  size = 10,
+  type = 'ALL',
+  categoryId = 'ALL',
+  start = '',
+  end = ''
 ): Promise<PagedResponse<Transaction>> {
   const response = await apiClient.get<PagedResponse<Transaction>>(
     '/transactions',
     {
       params: {
         page,
-        size
+        size,
+        ...(type !== 'ALL' && { type }),
+        ...(categoryId !== 'ALL' && { categoryId }),
+        ...(start && { start }),
+        ...(end && { end })
       }
     }
   )

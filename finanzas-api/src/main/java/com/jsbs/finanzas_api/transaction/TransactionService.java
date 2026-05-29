@@ -126,17 +126,24 @@ public class TransactionService {
     public PagedResponse<TransactionResponse> getAllTransactions(
             Pageable pageable,
             CategoryType type,
+            Long categoryId,
             LocalDateTime start,
             LocalDateTime end) {
 
         User currentUser = currentUserService.getCurrentUser();
 
-        Specification<Transaction> spec = TransactionSpecification.belongsToUser(currentUser);
+        Specification<Transaction> spec =
+                TransactionSpecification.belongsToUser(currentUser);
 
-        if (type != null){
+        if (type != null) {
             spec = spec.and(TransactionSpecification.hasCategoryType(type));
         }
-        if (start != null && end != null){
+
+        if (categoryId != null) {
+            spec = spec.and(TransactionSpecification.hasCategoryId(categoryId));
+        }
+
+        if (start != null && end != null) {
             spec = spec.and(TransactionSpecification.hasDateBetween(start, end));
         }
 

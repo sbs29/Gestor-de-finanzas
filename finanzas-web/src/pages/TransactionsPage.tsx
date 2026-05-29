@@ -26,10 +26,20 @@ function TransactionsPage() {
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
+  const [filterCategoryId, setFilterCategoryId] = useState('ALL')
+  const [filterStartDate, setFilterStartDate] = useState('')
+  const [filterEndDate, setFilterEndDate] = useState('')
 
   async function loadTransactions() {
     try {
-      const data = await getTransactions(page)
+      const data = await getTransactions(
+        page,
+        10,
+        filterType,
+        filterCategoryId,
+        filterStartDate ? new Date(filterStartDate).toISOString() : '',
+        filterEndDate ? new Date(filterEndDate).toISOString() : ''
+      )
 
       setTransactions(data.content)
       setTotalPages(data.totalPages)
@@ -53,7 +63,7 @@ function TransactionsPage() {
   useEffect(() => {
     loadTransactions()
     loadCategories()
-  }, [page])
+  }, [page, filterType, filterCategoryId, filterStartDate, filterEndDate])
 
   async function handleCreateTransaction(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -265,14 +275,83 @@ function TransactionsPage() {
       <section className="card">
         <h2>Filtros</h2>
 
-        <select
-          value={filterType}
-          onChange={(event) => setFilterType(event.target.value)}
-        >
-          <option value="ALL">Todas</option>
-          <option value="INCOME">Ingresos</option>
-          <option value="EXPENSE">Gastos</option>
-        </select>
+        <div className="filters-form">
+          <div>
+            <label htmlFor="type-filter">Tipo</label>
+            <select
+              id="type-filter"
+              value={filterType}
+              onChange={(event) => {
+                setFilterType(event.target.value)
+                setPage(0)
+              }}
+            >
+              <option value="ALL">Todas</option>
+              <option value="INCOME">Ingresos</option>
+              <option value="EXPENSE">Gastos</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="category-filter">Categoría</label>
+            <select
+              id="category-filter"
+              value={filterCategoryId}
+              onChange={(event) => {
+                setFilterCategoryId(event.target.value)
+                setPage(0)
+              }}
+            >
+              <option value="ALL">Todas</option>
+
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="start-date-filter">Desde</label>
+            <input
+              id="start-date-filter"
+              type="datetime-local"
+              value={filterStartDate}
+              onChange={(event) => {
+                setFilterStartDate(event.target.value)
+                setPage(0)
+              }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="end-date-filter">Hasta</label>
+            <input
+              id="end-date-filter"
+              type="datetime-local"
+              value={filterEndDate}
+              onChange={(event) => {
+                setFilterEndDate(event.target.value)
+                setPage(0)
+              }}
+            />
+          </div>
+          <div className="filters-actions">
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => {
+                setFilterType('ALL')
+                setFilterCategoryId('ALL')
+                setFilterStartDate('')
+                setFilterEndDate('')
+                setPage(0)
+              }}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
       </section>
 
       <section className="card">
