@@ -151,7 +151,7 @@ Gestor-de-finanzas
     │   └── types
     │
     └── package.json
-
+```
 ---
 
 ## Docker
