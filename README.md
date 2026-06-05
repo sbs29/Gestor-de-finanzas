@@ -6,6 +6,22 @@ El objetivo del proyecto es permitir a los usuarios gestionar ingresos, gastos y
 
 ---
 
+## Demo Online
+
+### Frontend
+
+https://gestor-de-finanzas-snowy.vercel.app
+
+### API
+
+https://finanzas-api-eza2.onrender.com
+
+### Swagger
+
+https://finanzas-api-eza2.onrender.com/swagger-ui/index.html
+
+---
+
 ## Características principales
 
 ### Autenticación y Seguridad
@@ -181,9 +197,13 @@ VITE_API_URL=http://localhost:8080/api
 
 Swagger UI disponible en:
 
-```text
+### Producción
+
+https://finanzas-api-eza2.onrender.com/swagger-ui/index.html
+
+### Local
+
 http://localhost:8080/swagger-ui/index.html
-```
 
 La documentación permite:
 
@@ -223,6 +243,10 @@ Durante el desarrollo se incluye un perfil local con datos de ejemplo:
 
 ![Login](images/login.png)
 
+### Swagger API
+
+![Swagger](images/swagger.png)
+
 ---
 
 ## Estado Actual
@@ -249,9 +273,35 @@ Durante el desarrollo se incluye un perfil local con datos de ejemplo:
 
 ### Despliegue
 
-🚧 En preparación
+✅ Backend desplegado en Render
+✅ Frontend desplegado en Vercel
 
 ---
+
+## Producción
+
+La aplicación se encuentra desplegada y accesible públicamente:
+
+### Backend
+
+- Render
+- PostgreSQL Neon
+- Spring Boot
+- JWT Authentication
+
+### Frontend
+
+- Vercel
+- React
+- TypeScript
+- Vite
+
+### Base de Datos
+
+- PostgreSQL
+- Neon Database
+
+> El primer acceso puede tardar unos segundos debido a las limitaciones del plan gratuito de Render.
 
 ## Roadmap
 
@@ -265,7 +315,7 @@ Durante el desarrollo se incluye un perfil local con datos de ejemplo:
 * [x] Frontend React
 * [x] Integración Full Stack
 * [x] Dashboard financiero
-* [ ] Despliegue
+* [x] Despliegue
 
 ### V2
 
