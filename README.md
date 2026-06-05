@@ -126,22 +126,31 @@ La aplicación utiliza autenticación JWT y control de acceso por usuario para g
 Gestor-de-finanzas
 │
 ├── finanzas-api
-│   ├── Controllers
-│   ├── Services
-│   ├── Repositories
-│   ├── DTOs
-│   ├── Security
-│   ├── Exceptions
-│   └── Docker
+│   ├── src/main/java/com/jsbs/finanzas_api
+│   │   ├── auth
+│   │   ├── category
+│   │   ├── common
+│   │   │   └── exception
+│   │   ├── config
+│   │   ├── security
+│   │   ├── summary
+│   │   ├── transaction
+│   │   └── user
+│   │
+│   ├── src/main/resources
+│   ├── Dockerfile
+│   └── docker-compose.yml
 │
 └── finanzas-web
-    ├── Pages
-    ├── Components
-    ├── Services
-    ├── Types
-    ├── Layouts
-    └── API
-```
+    ├── src
+    │   ├── api
+    │   ├── components
+    │   ├── layouts
+    │   ├── pages
+    │   ├── services
+    │   └── types
+    │
+    └── package.json
 
 ---
 
@@ -187,9 +196,11 @@ JWT_EXPIRATION_MS=
 
 ### Frontend
 
-```env
+# Local
 VITE_API_URL=http://localhost:8080/api
-```
+
+# Producción
+VITE_API_URL=https://finanzas-api-eza2.onrender.com/api
 
 ---
 
@@ -303,6 +314,8 @@ La aplicación se encuentra desplegada y accesible públicamente:
 
 > El primer acceso puede tardar unos segundos debido a las limitaciones del plan gratuito de Render.
 
+---
+
 ## Roadmap
 
 ### V1
@@ -315,7 +328,8 @@ La aplicación se encuentra desplegada y accesible públicamente:
 * [x] Frontend React
 * [x] Integración Full Stack
 * [x] Dashboard financiero
-* [x] Despliegue
+* [x] Despliegue Backend (Render)
+* [x] Despliegue Frontend (Vercel)
 
 ### V2
 
@@ -332,4 +346,4 @@ La aplicación se encuentra desplegada y accesible públicamente:
 
 ## Autor
 
-Desarrollado como proyecto de portfolio Full Stack utilizando Java, Spring Boot, React, PostgreSQL y Docker.
+Desarrollado por Sebastián Solano como proyecto de portfolio Full Stack utilizando Java, Spring Boot, React, PostgreSQL, Docker, Render, Vercel y Neon.
