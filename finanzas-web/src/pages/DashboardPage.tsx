@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { getTransactions } from '../services/transactionService'
 import type { Transaction } from '../types/Transaction'
 import PageHeader from '../components/PageHeader'
+import { getMonthlySummary } from '../services/dashboardService'
+import type { MonthlySummary } from '../types/MonthlySummary'
+import { MonthlyBalanceChart } from '../components/dashboard/MonthlyBalanceChart'
 
 function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -12,6 +15,7 @@ function DashboardPage() {
   const [analysisMode, setAnalysisMode] = useState('RELATIVE')
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [monthlySummary, setMonthlySummary] =useState<MonthlySummary[]>([])
 
   useEffect(() => {
     async function loadTransactions() {
@@ -27,6 +31,19 @@ function DashboardPage() {
 
     loadTransactions()
   }, [])
+
+  useEffect(() => {
+    async function loadMonthlySummary() {
+      try {
+        const data = await getMonthlySummary(selectedYear)
+        setMonthlySummary(data)
+      } catch (error) {
+        setError('No se pudo cargar el resumen mensual')
+      }
+    }
+
+    loadMonthlySummary()
+  }, [selectedYear])
 
   function getPeriodStartDate(period: string): Date {
     const now = new Date()
@@ -301,6 +318,12 @@ function DashboardPage() {
             </article>
           </div>
         </div>
+      </section>
+
+      <section className="card">
+        <h2>Resumen mensual</h2>
+
+        <MonthlyBalanceChart data={monthlySummary} />
       </section>
 
       <section className="card">
