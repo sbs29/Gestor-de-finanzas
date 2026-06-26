@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { getTransactions } from '../services/transactionService'
 import type { Transaction } from '../types/Transaction'
 import PageHeader from '../components/PageHeader'
-import MetricCard from '../components/MetricCard'
 
 function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [period, setPeriod] = useState('MONTH')
+  const [latestLimit, setLatestLimit] = useState(5)
 
   useEffect(() => {
     async function loadTransactions() {
@@ -72,7 +72,7 @@ function DashboardPage() {
 
   const balance = totalIncome - totalExpense
 
-  const latestTransactions = transactions.slice(0, 5)
+  const latestTransactions = transactions.slice(0, latestLimit)
 
   const categorySummary = periodTransactions.reduce(
     (accumulator, transaction) => {
@@ -118,12 +118,23 @@ function DashboardPage() {
         badgeText={`${periodTransactions.length} transacciones`}
       />
 
-      <section className="card">
-        <h2>Período</h2>
+      <section className="dashboard-hero">
+        <div>
+          <span className="dashboard-eyebrow">Resumen del período</span>
 
-        <div className="filters-form">
-          <div>
-            <label htmlFor="period-filter">Resumen</label>
+          <h2>Balance financiero</h2>
+
+          <p className={balance >= 0 ? 'hero-amount income' : 'hero-amount expense'}>
+            {balance.toFixed(2)} €
+          </p>
+
+          <p className="dashboard-hero__description">
+            Resultado calculado a partir de tus ingresos y gastos registrados.
+          </p>
+
+          <div className="dashboard-period-inline">
+            <label htmlFor="period-filter">Período</label>
+
             <select
               id="period-filter"
               value={period}
@@ -136,39 +147,27 @@ function DashboardPage() {
               <option value="SIX_MONTHS">Últimos 6 meses</option>
               <option value="YEAR">Último año</option>
             </select>
+
+            <span>{periodTransactions.length} movimientos analizados</span>
+          </div>
+
+          <div className="dashboard-hero-metrics">
+            <article>
+              <span>Ingresos</span>
+              <strong className="income">+{totalIncome.toFixed(2)} €</strong>
+            </article>
+
+            <article>
+              <span>Gastos</span>
+              <strong className="expense">-{totalExpense.toFixed(2)} €</strong>
+            </article>
+
+            <article>
+              <span>Transacciones</span>
+              <strong>{periodTransactions.length}</strong>
+            </article>
           </div>
         </div>
-      </section>
-
-      <section className="dashboard-grid">
-
-        <MetricCard
-          title="Balance"
-          value={`${balance.toFixed(2)} €`}
-          className={
-            balance >= 0
-              ? 'amount income'
-              : 'amount expense'
-          }
-        />
-
-        <MetricCard
-          title="Ingresos"
-          value={`+${totalIncome.toFixed(2)} €`}
-          className="amount income"
-        />
-
-        <MetricCard
-          title="Gastos"
-          value={`-${totalExpense.toFixed(2)} €`}
-          className="amount expense"
-        />
-
-        <MetricCard
-          title="Total transacciones"
-          value={periodTransactions.length.toString()}
-        />
-        
       </section>
 
       <section className="card">
@@ -179,38 +178,69 @@ function DashboardPage() {
             <p>No hay datos para el período seleccionado.</p>
           </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Categoría</th>
-                <th>Total</th>
-              </tr>
-            </thead>
+          <div className="category-summary-list">
+            {categoryTotals.map(([categoryName, data]) => {
+              const maxTotal = Math.max(
+                ...categoryTotals.map(([, item]) => item.total)
+              )
 
-            <tbody>
-              {categoryTotals.map(([categoryName, data]) => (
-                <tr key={categoryName}>
-                  <td>{categoryName}</td>
-                  <td
-                    className={
-                      data.type === 'INCOME'
-                        ? 'amount income'
-                        : 'amount expense'
-                    }
-                  >
-                    {data.type === 'INCOME' ? '+' : '-'}
-                    {data.total.toFixed(2)} €
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              const percentage = maxTotal > 0
+                ? (data.total / maxTotal) * 100
+                : 0
+
+              return (
+                <article className="category-summary-item" key={categoryName}>
+                  <div className="category-summary-item__header">
+                    <div>
+                      <strong>{categoryName}</strong>
+                      <span>{data.type === 'INCOME' ? 'Ingreso' : 'Gasto'}</span>
+                    </div>
+
+                    <p className={data.type === 'INCOME' ? 'amount income' : 'amount expense'}>
+                      {data.type === 'INCOME' ? '+' : '-'}
+                      {data.total.toFixed(2)} €
+                    </p>
+                  </div>
+
+                  <div className="category-summary-bar">
+                    <div
+                      className={
+                        data.type === 'INCOME'
+                          ? 'category-summary-bar__fill income-fill'
+                          : 'category-summary-bar__fill expense-fill'
+                      }
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </article>
+              )
+            })}
+          </div>
         )}
       </section>
 
       <section className="card">
-        <h2>Últimas transacciones</h2>
+        <div className="section-header">
+          <div>
+            <h2>Últimas transacciones</h2>
+            <p>Consulta tus movimientos más recientes.</p>
+          </div>
 
+          <div className="section-header__control">
+            <label htmlFor="latest-limit">Mostrar</label>
+
+            <select
+              id="latest-limit"
+              value={latestLimit}
+              onChange={(event) => setLatestLimit(Number(event.target.value))}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
+        </div>
+        
         {latestTransactions.length === 0 ? (
           <div className="empty-state">
             <p>No hay transacciones registradas.</p>
