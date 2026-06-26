@@ -9,6 +9,9 @@ function DashboardPage() {
   const [error, setError] = useState('')
   const [period, setPeriod] = useState('MONTH')
   const [latestLimit, setLatestLimit] = useState(5)
+  const [analysisMode, setAnalysisMode] = useState('RELATIVE')
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
   useEffect(() => {
     async function loadTransactions() {
@@ -56,11 +59,47 @@ function DashboardPage() {
     return startDate
   }
 
-  const periodStartDate = getPeriodStartDate(period)
+  function getAnalysisLabel(): string {
+  if (analysisMode === 'MONTH') {
+    return `Resumen de ${months[selectedMonth]} ${selectedYear}`
+  }
 
-  const periodTransactions = transactions.filter(transaction =>
-    new Date(transaction.date) >= periodStartDate
-  )
+  if (analysisMode === 'YEAR') {
+    return `Resumen del año ${selectedYear}`
+  }
+
+  const labels: Record<string, string> = {
+    WEEK: 'Resumen de la última semana',
+    FORTNIGHT: 'Resumen de la última quincena',
+    MONTH: 'Resumen del último mes',
+    THREE_MONTHS: 'Resumen de los últimos 3 meses',
+    SIX_MONTHS: 'Resumen de los últimos 6 meses',
+    YEAR: 'Resumen del último año'
+  }
+
+  return labels[period]
+}
+
+  const periodTransactions = transactions.filter(transaction => {
+    const transactionDate = new Date(transaction.date)
+
+    if (analysisMode === 'RELATIVE') {
+      return transactionDate >= getPeriodStartDate(period)
+    }
+
+    if (analysisMode === 'MONTH') {
+      return (
+        transactionDate.getMonth() === selectedMonth &&
+        transactionDate.getFullYear() === selectedYear
+      )
+    }
+
+    if (analysisMode === 'YEAR') {
+      return transactionDate.getFullYear() === selectedYear
+    }
+
+    return true
+  })
 
   const totalIncome = periodTransactions
     .filter(transaction => transaction.categoryType === 'INCOME')
@@ -102,6 +141,28 @@ function DashboardPage() {
   const categoryTotals = Object.entries(categorySummary)
     .sort((a, b) => b[1].total - a[1].total)
 
+  const months = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ]
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from(
+    { length: 5 },
+    (_, index) => currentYear - index
+  )
+  const analysisLabel = getAnalysisLabel()
+
   if (loading) {
     return <p>Cargando dashboard...</p>
   }
@@ -120,7 +181,7 @@ function DashboardPage() {
 
       <section className="dashboard-hero">
         <div>
-          <span className="dashboard-eyebrow">Resumen del período</span>
+          <span className="dashboard-eyebrow">{analysisLabel}</span>
 
           <h2>Balance financiero</h2>
 
@@ -133,20 +194,92 @@ function DashboardPage() {
           </p>
 
           <div className="dashboard-period-inline">
-            <label htmlFor="period-filter">Período</label>
+            <div>
+              <label htmlFor="analysis-mode">Tipo de análisis</label>
 
-            <select
-              id="period-filter"
-              value={period}
-              onChange={(event) => setPeriod(event.target.value)}
-            >
-              <option value="WEEK">Última semana</option>
-              <option value="FORTNIGHT">Última quincena</option>
-              <option value="MONTH">Último mes</option>
-              <option value="THREE_MONTHS">Últimos 3 meses</option>
-              <option value="SIX_MONTHS">Últimos 6 meses</option>
-              <option value="YEAR">Último año</option>
-            </select>
+              <select
+                id="analysis-mode"
+                value={analysisMode}
+                onChange={(event) => setAnalysisMode(event.target.value)}
+              >
+                <option value="RELATIVE">Período rápido</option>
+                <option value="MONTH">Mes específico</option>
+                <option value="YEAR">Año completo</option>
+              </select>
+            </div>
+
+            {analysisMode === 'RELATIVE' && (
+              <div>
+                <label htmlFor="period-filter">Período</label>
+
+                <select
+                  id="period-filter"
+                  value={period}
+                  onChange={(event) => setPeriod(event.target.value)}
+                >
+                  <option value="WEEK">Última semana</option>
+                  <option value="FORTNIGHT">Última quincena</option>
+                  <option value="MONTH">Último mes</option>
+                  <option value="THREE_MONTHS">Últimos 3 meses</option>
+                  <option value="SIX_MONTHS">Últimos 6 meses</option>
+                  <option value="YEAR">Último año</option>
+                </select>
+              </div>
+            )}
+
+            {analysisMode === 'MONTH' && (
+              <>
+                <div>
+                  <label htmlFor="month-filter">Mes</label>
+
+                  <select
+                    id="month-filter"
+                    value={selectedMonth}
+                    onChange={(event) => setSelectedMonth(Number(event.target.value))}
+                  >
+                    {months.map((month, index) => (
+                      <option key={month} value={index}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="year-filter-month">Año</label>
+
+                  <select
+                    id="year-filter-month"
+                    value={selectedYear}
+                    onChange={(event) => setSelectedYear(Number(event.target.value))}
+                  >
+                    {years.map(year => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            {analysisMode === 'YEAR' && (
+              <div>
+                <label htmlFor="year-filter">Año</label>
+
+                <select
+                  id="year-filter"
+                  value={selectedYear}
+                  onChange={(event) => setSelectedYear(Number(event.target.value))}
+                >
+                  {years.map(year => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <span>{periodTransactions.length} movimientos analizados</span>
           </div>
@@ -240,7 +373,7 @@ function DashboardPage() {
             </select>
           </div>
         </div>
-        
+
         {latestTransactions.length === 0 ? (
           <div className="empty-state">
             <p>No hay transacciones registradas.</p>
