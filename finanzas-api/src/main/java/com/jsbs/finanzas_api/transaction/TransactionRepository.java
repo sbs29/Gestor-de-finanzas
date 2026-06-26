@@ -1,5 +1,6 @@
 package com.jsbs.finanzas_api.transaction;
 
+import com.jsbs.finanzas_api.dashboard.dto.ExpenseByCategoryResponse;
 import com.jsbs.finanzas_api.dashboard.dto.MonthlySummaryResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -40,6 +41,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         ORDER BY MONTH(t.date)
         """)
     List<MonthlySummaryResponse> getMonthlySummaryByYear(
+            Long userId,
+            Integer year
+    );
+
+    @Query("""
+    SELECT new com.jsbs.finanzas_api.dashboard.dto.ExpenseByCategoryResponse(
+        t.category.name,
+        COALESCE(SUM(t.amount), 0)
+    )
+    FROM Transaction t
+    WHERE t.user.id = :userId
+    AND t.category.type = 'EXPENSE'
+    AND YEAR(t.date) = :year
+    GROUP BY t.category.name
+    ORDER BY SUM(t.amount) DESC
+    """)
+    List<ExpenseByCategoryResponse> getExpensesByCategory(
             Long userId,
             Integer year
     );

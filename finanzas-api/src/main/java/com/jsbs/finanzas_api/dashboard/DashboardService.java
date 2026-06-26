@@ -5,6 +5,7 @@ import com.jsbs.finanzas_api.security.CurrentUserService;
 import com.jsbs.finanzas_api.transaction.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.jsbs.finanzas_api.dashboard.dto.ExpenseByCategoryResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,5 +43,11 @@ public class DashboardService {
                         )
                 ))
                 .toList();
+    }
+
+    public List<ExpenseByCategoryResponse> getExpensesByCategory(Integer year) {
+        Long userId = currentUserService.getCurrentUser().getId();
+
+        return transactionRepository.getExpensesByCategory(userId, year);
     }
 }

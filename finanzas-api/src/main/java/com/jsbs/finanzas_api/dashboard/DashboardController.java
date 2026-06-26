@@ -1,6 +1,7 @@
 package com.jsbs.finanzas_api.dashboard;
 
 import com.jsbs.finanzas_api.dashboard.dto.MonthlySummaryResponse;
+import com.jsbs.finanzas_api.dashboard.dto.ExpenseByCategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +22,12 @@ public class DashboardController {
             @RequestParam Integer year
     ) {
         return dashboardService.getMonthlySummaryByYear(year);
+    }
+
+    @GetMapping("/expenses-by-category")
+    public List<ExpenseByCategoryResponse> getExpensesByCategory(
+            @RequestParam Integer year
+    ) {
+        return dashboardService.getExpensesByCategory(year);
     }
 }

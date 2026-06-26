@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react'
 import { getTransactions } from '../services/transactionService'
 import type { Transaction } from '../types/Transaction'
 import PageHeader from '../components/PageHeader'
-import { getMonthlySummary } from '../services/dashboardService'
+import {
+  getMonthlySummary,
+  getExpensesByCategory,
+} from '../services/dashboardService'
 import type { MonthlySummary } from '../types/MonthlySummary'
 import { MonthlyBalanceChart } from '../components/dashboard/MonthlyBalanceChart'
+import { ExpensesByCategoryChart } from '../components/dashboard/ExpensesByCategoryChart'
+import type { ExpenseByCategory } from '../types/ExpenseByCategory'
 
 function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -16,6 +21,7 @@ function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [monthlySummary, setMonthlySummary] =useState<MonthlySummary[]>([])
+  const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([])
 
   useEffect(() => {
     async function loadTransactions() {
@@ -43,6 +49,19 @@ function DashboardPage() {
     }
 
     loadMonthlySummary()
+  }, [selectedYear])
+
+  useEffect(() => {
+    async function loadExpensesByCategory() {
+      try {
+        const data = await getExpensesByCategory(selectedYear)
+        setExpensesByCategory(data)
+      } catch (error) {
+        setError('No se pudieron cargar los gastos por categoría')
+      }
+    }
+
+    loadExpensesByCategory()
   }, [selectedYear])
 
   function getPeriodStartDate(period: string): Date {
@@ -324,6 +343,10 @@ function DashboardPage() {
         <h2>Resumen mensual</h2>
 
         <MonthlyBalanceChart data={monthlySummary} />
+        <ExpensesByCategoryChart
+          data={expensesByCategory}
+          year={selectedYear}
+        />
       </section>
 
       <section className="card">
