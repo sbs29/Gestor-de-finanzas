@@ -530,7 +530,6 @@ nav {
   }
 }
 
-
 /* =========================
    BUTTONS
 ========================= */
@@ -805,6 +804,18 @@ nav {
   width: 320px;
   height: 300px;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .expenses-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chart-legend-list {
+    width: 100%;
+    max-width: 260px;
+  }
 }
 
 /* Donut legend */
