@@ -41,9 +41,13 @@ function HomePage() {
             </p>
 
             <div className="home-actions">
-              <Link to="/login" className="primary-button">
-                Iniciar sesión
-              </Link>
+                <Link to="/login" className="primary-button">
+                    Iniciar sesión
+                </Link>
+
+                <Link to="/register" className="secondary-button">
+                    Crear cuenta
+                </Link>
             </div>
           </>
         )}

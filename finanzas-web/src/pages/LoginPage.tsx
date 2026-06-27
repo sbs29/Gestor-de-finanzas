@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { Navigate } from "react-router-dom";
 import { sessionService } from "../services/sessionService";
@@ -89,6 +89,9 @@ function LoginPage() {
             {message}
           </p>
         )}
+        <p className="auth-switch">
+          ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
+        </p>
       </section>
     </section>
   )

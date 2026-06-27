@@ -22,14 +22,17 @@ function Navbar() {
         {isAuthenticated ? (
           <>
             <Link to="/dashboard">Dashboard</Link>
-            <Link to="/categories">Categorías</Link>
             <Link to="/transactions">Transacciones</Link>
+            <Link to="/categories">Categorías</Link>
             <button onClick={handleLogout} className="secondary-button">
               Logout
             </button>
           </>
         ) : (
-          <Link to="/login">Login</Link>
+          <>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Registro</Link>
+          </>
         )}
       </div>
     </nav>
