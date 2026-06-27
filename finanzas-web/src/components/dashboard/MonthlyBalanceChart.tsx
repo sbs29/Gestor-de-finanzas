@@ -1,19 +1,19 @@
 import {
   ComposedChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
   Bar,
-  Legend,
 } from 'recharts'
 
 import type { MonthlySummary } from '../../types/MonthlySummary'
+import { CustomTooltip } from './CustomTooltip'
 
 interface MonthlyBalanceChartProps {
   data: MonthlySummary[]
+  year: number
 }
 
 const monthNames = [
@@ -21,7 +21,7 @@ const monthNames = [
   'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
 ]
 
-export function MonthlyBalanceChart({ data }: MonthlyBalanceChartProps) {
+export function MonthlyBalanceChart({ data , year, }: MonthlyBalanceChartProps) {
   const chartData = data.map((item) => ({
     month: monthNames[item.month - 1],
     income: item.income,
@@ -31,21 +31,37 @@ export function MonthlyBalanceChart({ data }: MonthlyBalanceChartProps) {
 
   return (
     <section className="card">
-      <h2>Evolución mensual del balance</h2>
+      <h2>Ingresos y gastos mensuales · {year}</h2>
 
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <ComposedChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `${value} €`}
+            />
             <Tooltip
+              content={<CustomTooltip />}
+              itemSorter={(item) => {
+                const order: Record<string, number> = {
+                  income: 0,
+                  expense: 1,
+                }
+
+                return order[String(item.dataKey)] ?? 99
+              }}
+
               formatter={(value, name) => {
                 const labels: Record<string, string> = {
                   income: 'Ingresos',
                   expense: 'Gastos',
-                  balance: 'Balance',
                 }
 
                 const formattedValue =
@@ -59,19 +75,21 @@ export function MonthlyBalanceChart({ data }: MonthlyBalanceChartProps) {
 
             <Bar dataKey="income" fill="#86efac" name="Ingresos" />
             <Bar dataKey="expense" fill="#f87171" name="Gastos" />
-
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              dot={{ r: 4 }}
-              name="Balance"
-            />
-
-            <Legend />
+          
           </ComposedChart>
         </ResponsiveContainer>
+      </div>
+      <div className="chart-custom-legend">
+        <div className="chart-custom-legend-item">
+          <span className="legend-dot legend-income" />
+          <span>Ingresos</span>
+        </div>
+
+        <div className="chart-custom-legend-item">
+          <span className="legend-dot legend-expense" />
+          <span>Gastos</span>
+        </div>
+
       </div>
     </section>
   )

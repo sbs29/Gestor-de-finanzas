@@ -9,6 +9,7 @@ import {
 import type { MonthlySummary } from '../types/MonthlySummary'
 import { MonthlyBalanceChart } from '../components/dashboard/MonthlyBalanceChart'
 import { ExpensesByCategoryChart } from '../components/dashboard/ExpensesByCategoryChart'
+import { SavingsEvolutionChart } from '../components/dashboard/SavingsEvolutionChart'
 import type { ExpenseByCategory } from '../types/ExpenseByCategory'
 
 function DashboardPage() {
@@ -342,9 +343,16 @@ function DashboardPage() {
       <section className="card">
         <h2>Resumen mensual</h2>
 
-        <MonthlyBalanceChart data={monthlySummary} />
+        <MonthlyBalanceChart
+          data={monthlySummary}
+          year={selectedYear}
+        />
         <ExpensesByCategoryChart
           data={expensesByCategory}
+          year={selectedYear}
+        />
+        <SavingsEvolutionChart
+          data={monthlySummary}
           year={selectedYear}
         />
       </section>

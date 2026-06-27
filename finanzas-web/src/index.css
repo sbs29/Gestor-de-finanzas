@@ -791,13 +791,14 @@ nav {
    CHARTS
 ========================= */
 
-.expenses-content{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:2rem;
+/* Donut chart layout */
 
-    min-height:320px;
+.expenses-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  min-height: 320px;
 }
 
 .expenses-chart {
@@ -806,22 +807,24 @@ nav {
   flex-shrink: 0;
 }
 
-.chart-legend-list{
-    list-style:none;
-    padding:0;
-    margin:0;
-    width:180px;
-    display:grid;
-    gap:0.75rem;
-    align-self:center;
-    font-size:0.9rem;
+/* Donut legend */
+
+.chart-legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 180px;
+  display: grid;
+  gap: 0.75rem;
+  align-self: center;
+  font-size: 0.9rem;
 }
 
-.chart-legend-item{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .chart-legend-label {
@@ -835,4 +838,87 @@ nav {
   height: 12px;
   border-radius: 999px;
   flex-shrink: 0;
+}
+
+/* Generic chart legend */
+
+.chart-custom-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.chart-custom-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-income {
+  background-color: #86efac;
+}
+
+.legend-expense {
+  background-color: #f87171;
+}
+
+.legend-line {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.legend-balance {
+  background-color: #3b82f6;
+}
+
+/* Custom tooltip */
+
+.custom-tooltip {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  min-width: 180px;
+}
+
+.custom-tooltip-title {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.custom-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.custom-tooltip-row.income {
+  color: #22c55e;
+}
+
+.custom-tooltip-row.expense {
+  color: #ef4444;
+}
+
+.custom-tooltip-row.balance {
+  color: #3b82f6;
+}
+
+.custom-tooltip hr {
+  margin: 0.5rem 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
 }
