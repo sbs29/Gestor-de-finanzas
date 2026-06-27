@@ -1,40 +1,39 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
+import { sessionService } from "../services/sessionService";
 
 function Navbar() {
-  const navigate = useNavigate()
-  const token = localStorage.getItem('token')
+  const navigate = useNavigate();
+  const isAuthenticated = sessionService.isAuthenticated();
 
-  function handleLogout() {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
+  const handleLogout = () => {
+    sessionService.logout();
+    navigate("/login");
+  };
 
   return (
-    <header className="app-header">
-      <div className="app-header__content">
-        <Link to="/" className="app-logo">
-          Finanzas App
-        </Link>
+    <nav className="navbar">
+      <Link to="/" className="navbar-logo">
+        Finanzas Web
+      </Link>
 
-        <nav className="app-nav">
-          <Link to="/">Home</Link>
+      <div className="navbar-links">
+        <Link to="/">Inicio</Link>
+
+        {isAuthenticated ? (
+          <>
+            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/categories">Categorías</Link>
+            <Link to="/transactions">Transacciones</Link>
+            <button onClick={handleLogout} className="secondary-button">
+              Logout
+            </button>
+          </>
+        ) : (
           <Link to="/login">Login</Link>
-
-          {token && (
-            <>
-              <Link to="/dashboard">Dashboard</Link>
-              <Link to="/transactions">Transactions</Link>
-              <Link to="/categories">Categories</Link>
-
-              <button type="button" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          )}
-        </nav>
+        )}
       </div>
-    </header>
-  )
+    </nav>
+  );
 }
 
-export default Navbar
+export default Navbar;

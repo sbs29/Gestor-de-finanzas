@@ -33,7 +33,16 @@ export function CustomTooltip({
         <strong>
           -{Number(payload[1].value).toFixed(2)} €
         </strong>
-      </div>  
+      </div>
+
+      <hr />
+
+      <div className="custom-tooltip-row balance">
+        <span>Balance</span>
+        <strong>
+          {Number(payload[2].value).toFixed(2)} €
+        </strong>
+      </div>
 
     </div>
   )

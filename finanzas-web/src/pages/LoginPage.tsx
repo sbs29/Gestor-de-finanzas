@@ -1,12 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
+import { Navigate } from "react-router-dom";
+import { sessionService } from "../services/sessionService";
 
 function LoginPage() {
   const [email, setEmail] = useState('demo@finanzas.com')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
+
+  if (sessionService.isAuthenticated()) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   async function handleLogin() {
     try {
