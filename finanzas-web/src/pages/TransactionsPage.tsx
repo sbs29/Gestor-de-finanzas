@@ -32,6 +32,7 @@ function TransactionsPage() {
   const [filterEndDate, setFilterEndDate] = useState('')
 
   async function loadTransactions() {
+    setLoading(true)
     try {
       const data = await getTransactions(
         page,
@@ -112,14 +113,15 @@ function TransactionsPage() {
 
         setFormMessage('Transacción creada correctamente')
       }
-      setDescription('')
-      setAmount('')
-      setDate('')
-      setEditingTransactionId(null)
+      resetTransactionForm()
 
       await loadTransactions()
     } catch (error) {
-      setFormMessage('No se pudo crear la transacción')
+        setFormMessage(
+          editingTransactionId
+            ? 'No se pudo actualizar la transacción'
+            : 'No se pudo crear la transacción'
+        )
     } finally {
       setSubmitting(false)
     }
@@ -147,17 +149,28 @@ function TransactionsPage() {
 
   function handleStartEditTransaction(transaction: Transaction) {
     setEditingTransactionId(transaction.id)
-
     setDescription(transaction.description)
-
     setAmount(String(transaction.amount))
-
     setDate(transaction.date.slice(0,16))
-
     setCategoryId(String(transaction.categoryId))
-
     setFormMessage('')
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
 
+  function resetTransactionForm() {
+    setDescription('')
+    setAmount('')
+    setDate('')
+    setCategoryId(
+      categories.length > 0
+        ? String(categories[0].id)
+        : ''
+    )
+    setEditingTransactionId(null)
+    setFormMessage('')
   }
 
   if (loading) {
@@ -236,21 +249,18 @@ function TransactionsPage() {
 
           <button type="submit" className='primary-button' disabled={submitting}>
             {submitting
-              ? 'Guardando...'
+              ? editingTransactionId
+                  ? 'Actualizando...'
+                  : 'Guardando...'
               : editingTransactionId
-                ? 'Actualizar transacción'
-                : 'Crear transacción'}
+                  ? 'Actualizar transacción'
+                  : 'Crear transacción'}
           </button>
           {editingTransactionId && (
             <button
               type="button"
-              onClick={() => {
-                setEditingTransactionId(null)
-                setDescription('')
-                setAmount('')
-                setDate('')
-                setFormMessage('')
-              }}
+              className="secondary-button"
+              onClick={resetTransactionForm}
             >
               Cancelar edición
             </button>
