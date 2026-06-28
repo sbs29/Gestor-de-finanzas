@@ -6,6 +6,7 @@ import com.jsbs.finanzas_api.auth.LoginResponse;
 import com.jsbs.finanzas_api.auth.RegisterRequest;
 import com.jsbs.finanzas_api.common.exception.EmailAlreadyExistsException;
 import com.jsbs.finanzas_api.common.exception.InvalidCredentialsException;
+import com.jsbs.finanzas_api.security.CurrentUserService;
 import com.jsbs.finanzas_api.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,12 +17,10 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final JwtService jwtService;
-
     private final UserMapper userMapper;
+    private final CurrentUserService currentUserService;
 
     public AuthResponse register(RegisterRequest request) {
 
@@ -54,5 +53,9 @@ public class UserService {
         return new LoginResponse(token);
     }
 
+    public UserProfileResponse getCurrentUserProfile() {
+        User user = currentUserService.getCurrentUser();
+        return userMapper.toUserProfileResponse(user);
+    }
 
 }

@@ -24,6 +24,7 @@ function Navbar() {
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/transactions">Transacciones</Link>
             <Link to="/categories">Categorías</Link>
+            <Link to="/profile">Mi Perfil</Link>
             <button onClick={handleLogout} className="secondary-button">
               Logout
             </button>

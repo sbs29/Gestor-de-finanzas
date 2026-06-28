@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import { sessionService } from "../services/sessionService";
 
 function LoginPage() {
-  const [email, setEmail] = useState('demo@finanzas.com')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
   const navigate = useNavigate()

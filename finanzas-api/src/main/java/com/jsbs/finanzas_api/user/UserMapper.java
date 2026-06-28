@@ -14,4 +14,13 @@ public class UserMapper {
                 user.getRole().toString()
         );
     }
+
+    public UserProfileResponse toUserProfileResponse(User user) {
+        return new UserProfileResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole().toString()
+        );
+    }
 }
